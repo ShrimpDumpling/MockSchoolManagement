@@ -1,0 +1,46 @@
+﻿@model IEnumerable<Student>;
+@{
+    ViewBag.Title = "学生详情页面";
+
+}
+
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">Id</th>
+            <th scope="col">Phot</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Major</th>
+            <th scope="col">Modify</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var student in Model)
+        {
+            var photoPath = "~/image/" + (student.PhotoPath ?? "exw.gif");
+            <tr style="line-height: 80px">
+                <th scope="row">@student.Id</th>
+                <th>
+                    <img class="img-thumbnail" src="@photoPath"
+                         asp-append-version="true" style="height:80px"/>
+                </th>
+                <th>@student.Name</th>
+                <th>@student.Email</th>
+                <th>@student.Major.GetDisplayName()</th>
+                <th>
+                    <a asp-controller="home" asp-action="details" asp-route-id="@student.Id" class="btn btn-primary m-1">查看</a>
+                    <a asp-controller="home" asp-action="edit" asp-route-id="@student.Id" class="btn btn-primary m-1">编辑</a>
+                    <a asp-controller="home" asp-action="remove" asp-route-id="@student.Id" class="btn btn-primary m-1">删除</a>
+                </th>
+            </tr>
+        }
+        </tbody>
+</table>
+
+
+@*@section Scripts{
+        <script src="~/js/site.js"></script>
+    }*@
