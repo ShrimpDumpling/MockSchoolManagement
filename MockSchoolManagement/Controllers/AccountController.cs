@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using MockSchoolManagement.Models;
 using MockSchoolManagement.ViewModels;
 using System;
 using System.Collections.Generic;
@@ -9,13 +10,14 @@ using System.Threading.Tasks;
 
 namespace MockSchoolManagement.Controllers
 {
+    [AllowAnonymous]
     public class AccountController : Controller
     {
-        private UserManager<IdentityUser> _userManager;
-        private SignInManager<IdentityUser> _signInManager;
+        private UserManager<ApplicationUser> _userManager;
+        private SignInManager<ApplicationUser> _signInManager;
 
-        public AccountController(UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager)
+        public AccountController(UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -33,7 +35,6 @@ namespace MockSchoolManagement.Controllers
         }
 
         [HttpPost]
-        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model,string returnUrl)
         {
             if (ModelState.IsValid)
@@ -57,6 +58,20 @@ namespace MockSchoolManagement.Controllers
         }
 
 
+        [AcceptVerbs("Get","Post")]
+        public async Task<IActionResult> IsEmailInUse(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user==null)
+            {
+                return Json(true);
+            }
+            else
+            {
+                return Json($"邮箱：{email}已经被注册使用了");
+            }
+        }
+
 
         [HttpGet]
         public IActionResult Register()
@@ -68,10 +83,11 @@ namespace MockSchoolManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var user = new IdentityUser
+            var user = new ApplicationUser
             {
                 UserName = model.Email,
-                Email=model.Email
+                Email=model.Email,
+                City=model.City
             };
             var result = await _userManager.CreateAsync(user, model.Password);
 

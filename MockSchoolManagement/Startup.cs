@@ -32,9 +32,10 @@ namespace MockSchoolManagement
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IStudentRepository, SQLStudentRepositry>();
-            services.AddIdentity<IdentityUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>();
+
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 6;

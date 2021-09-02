@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace MockSchoolManagement.Models
 {
+    //扩展的IdentityUser类，添加了城市
     public class ApplicationUser:IdentityUser
     {
         public string City { get; set; }

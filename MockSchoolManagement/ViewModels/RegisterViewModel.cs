@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using MockSchoolManagement.CustomerMiddlewares.Utils;
 
 namespace MockSchoolManagement.ViewModels
 {
@@ -10,7 +12,10 @@ namespace MockSchoolManagement.ViewModels
     {
         [Required]
         [EmailAddress]
-        [Display(Name ="邮箱地址")]
+        [Display(Name = "邮箱地址")]
+        //[Remote(action:"IsEmailInUse",controller:"Account")]
+        [ValiEmailDomain(allowedDomain:"outlook.com",
+            ErrorMessage ="邮箱地址的后缀必须是outook.com")]
         public string Email { get; set; }
 
         [Required]
@@ -18,6 +23,9 @@ namespace MockSchoolManagement.ViewModels
         [Display(Name ="密码")]
         public string Password { get; set; }
 
+        [Required]
+        [Display(Name = "城市")]
+        public string City { get; set; }
 
         [Required]
         [DataType(DataType.Password)]
