@@ -8,6 +8,7 @@ using MockSchoolManagement.DataRepositories;
 using MockSchoolManagement.ViewModels;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Authorization;
 
 namespace MockSchoolManagement.Controllers
 {
@@ -43,11 +44,15 @@ namespace MockSchoolManagement.Controllers
 
             return View(model);
         }
+
+        [Authorize]
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
+
+        [Authorize]
         [HttpPost]
         public IActionResult Create(StudentCreateViewModel student)
         {

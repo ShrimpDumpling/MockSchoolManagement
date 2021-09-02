@@ -14,6 +14,8 @@ using MockSchoolManagement.DataRepositories;
 using Microsoft.EntityFrameworkCore.SqlServer;
 using MockSchoolManagement.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using MockSchoolManagement.CustomerMiddlewares;
 
 namespace MockSchoolManagement
 {
@@ -30,6 +32,18 @@ namespace MockSchoolManagement
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddScoped<IStudentRepository, SQLStudentRepositry>();
+            services.AddIdentity<IdentityUser, IdentityRole>()
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddErrorDescriber<CustomIdentityErrorDescriber>();
+            services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 6;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+            });
+
+
             //services.AddRazorPages();
             services.AddDbContextPool<AppDbContext>(
                 options => 
@@ -65,8 +79,8 @@ namespace MockSchoolManagement
 
             app.UseFileServer();
 
-            app.UseAuthentication();
-            app.UseAuthorization();
+            app.UseAuthentication();//ÊÚÈ¨
+            app.UseAuthorization();//ÑéÖ¤
 
             app.UseMvc(routes => {
                 routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");

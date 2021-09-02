@@ -5,10 +5,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using MockSchoolManagement.Models;
 using MockSchoolManagement.Models.EnumTypes;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace MockSchoolManagement.Infrastructure
 {
-    public class AppDbContext:DbContext
+    public class AppDbContext:IdentityDbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options)
             :base(options)
@@ -18,7 +19,9 @@ namespace MockSchoolManagement.Infrastructure
         public DbSet<Student> Students { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
         }
+
     }
 }
