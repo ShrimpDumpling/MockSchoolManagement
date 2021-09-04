@@ -9,6 +9,11 @@ namespace MockSchoolManagement.ViewModels
 {
     public class EditRoleViewModel
     {
+        public EditRoleViewModel()
+        {
+            Users = new List<string>();
+        }
+
         [Display(Name ="角色ID")]
         public string Id { get; set; }
 
