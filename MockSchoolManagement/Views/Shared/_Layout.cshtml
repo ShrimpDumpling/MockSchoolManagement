@@ -30,11 +30,11 @@
                 <li class="nav-item">
                     <a asp-controller="home" asp-action="create" class="nav-link">创建</a>
                 </li>
-                <li class="nav-item">
+                @*<li class="nav-item">
                     <a class="nav-link" asp-controller="Admin" asp-action="ListRoles">
                         管理
                     </a>
-                </li>
+                </li>*@
             </ul>
 
             @*@inject SignInManager<IdentityUser> _signInManager*@
@@ -50,12 +50,14 @@
                         </button>
                     </form>
                 </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" asp-controller="admin" asp-action="listroles">
-                        角色管理
-                    </a>
-                </li>
+                @if (User.IsInRole("Admin"))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="admin" asp-action="listroles">
+                            角色管理
+                        </a>
+                    </li>
+                }
             }
             else
             {

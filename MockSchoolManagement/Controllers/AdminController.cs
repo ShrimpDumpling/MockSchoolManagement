@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MockSchoolManagement.Controllers
 {
-
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly RoleManager<IdentityRole> _roleManager;
@@ -25,10 +25,76 @@ namespace MockSchoolManagement.Controllers
         }
 
         [HttpGet]
+        public IActionResult ListUsers()
+        {
+            var users = _userManager.Users.ToList();
+            return View(users);
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> EditUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = $"无法找到ID为{id}的用户";
+                return View("NotFound");
+            }
+
+            var userClaims = await _userManager.GetClaimsAsync(user);
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var model = new EditUserViewModel
+            {
+                Id = user.Id,
+                Email = user.Email,
+                UserName = user.UserName,
+                City = user.City,
+                Claims = userClaims.Select(c => c.Value).ToList(),
+                Roles = userRoles.ToList(),
+            };
+            return View(model);
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EditUser(EditUserViewModel model)
+        {
+            var user = await _userManager.FindByIdAsync(model.Id);
+            if (user==null)
+            {
+                ViewBag.ErrorMessager = $"无法找到ID为{model.Id}";
+                return View("NotFound");
+            }
+            else
+            {
+                user.Email = model.Email;
+                user.UserName = model.UserName;
+                user.City = model.City;
+
+                var result = await _userManager.UpdateAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListUsers");
+                }
+                foreach(var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+
+                return View(model);
+            }
+
+        }
+
+
+            [HttpGet]
         public IActionResult CreateRole()
         {
             return View();
         }
+
 
         [HttpPost]
         public async Task<IActionResult> CreateRole(CreateRoleViewModel model)

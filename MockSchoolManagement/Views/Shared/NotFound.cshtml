@@ -1,0 +1,37 @@
+﻿@{ ViewBag.Title = "页面不存在"; }
+
+
+
+<div class="alert alert-danger mt-1 mb-1">
+    <h4>404 Not Found 错误 :</h4>
+    <hr />
+    <h5>
+        @ViewBag.ErrorMessage
+    </h5>
+</div>
+
+<a asp-controller="home" asp-action="index" class="btn btn-outline-success" style="width:auto" id="GoHome">  点击此处返回首页</a>
+
+<h2 id="AutoGoHome">n秒后自动返回首页</h2>
+
+
+@section Scripts{
+    <script>
+
+        var h2 = $("#AutoGoHome");
+        var timeout = 8;
+
+        var AutoGoHmoe = setInterval(SetTitle, 1000);
+
+        function SetTitle() {
+            timeout--;
+            if (timeout < 0) {
+                $("#GoHome")[0].click();
+                window.clearInterval(AutoGoHmoe);
+            }
+            h2[0].innerText = (timeout + "秒后自动返回首页");
+            //h2[0].innerText = (timeout + "秒后自动返回首页");
+        }
+        AutoGoHmoe.toFixed
+    </script>
+}
