@@ -256,5 +256,55 @@ namespace MockSchoolManagement.Controllers
             }
             return RedirectToAction("EditRole", new { id = roleId });
         }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+
+            if (user==null)
+            {
+                ViewBag.ErrorMessage = $"无法找到id为{id}的用户";
+                return View("NotFound");
+            }
+            else
+            {
+                var result = await _userManager.DeleteAsync(user);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListUsers");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View("Listusers");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteRole(string id)
+        {
+            var role = await _roleManager.FindByIdAsync(id);
+
+            if (role == null)
+            {
+                ViewBag.ErrorMessage = $"无法找到id为{id}的角色";
+                return View("NotFound");
+            }
+            else
+            {
+                var result = await _roleManager.DeleteAsync(role);
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("ListRoles");
+                }
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError("", error.Description);
+                }
+                return View("ListRoles");
+            }
+        }
     }
 }
