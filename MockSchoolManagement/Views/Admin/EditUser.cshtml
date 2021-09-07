@@ -61,7 +61,8 @@
             }
         </div>
         <div class="card-footer">
-            <a href="#" style="width:auto" class="btn btn-primary">
+            <a asp-controller="admin" asp-action="ManageUserRoles"
+               href="#" style="width:auto" class="btn btn-primary">
                 管理角色
             </a>
         </div>
@@ -85,7 +86,8 @@
             }
         </div>
         <div class="card-footer">
-            <a href="#" style="width:auto" class="btn btn-primary">
+            <a asp-controller="Admin" asp-action="ManageUserClaims" asp-route-UserId="@Model.Id"
+               href="#" style="width:auto" class="btn btn-primary">
                 管理声明
             </a>
         </div>
