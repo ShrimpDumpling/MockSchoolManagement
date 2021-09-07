@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -33,6 +34,8 @@ namespace MockSchoolManagement.Controllers
             }
             return View("NotFound");
         }
+
+        [AllowAnonymous]
         [Route("/Error")]
         public IActionResult Error()
         {

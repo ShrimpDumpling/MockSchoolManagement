@@ -10,6 +10,10 @@ namespace MockSchoolManagement.Infrastructure
 {
     public static class ModelBuilderExtensions
     {
+        /// <summary>
+        /// 自定义的种子数据
+        /// </summary>
+        /// <param name="modelBuilder"></param>
         public static void Seed(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Student>().HasData(

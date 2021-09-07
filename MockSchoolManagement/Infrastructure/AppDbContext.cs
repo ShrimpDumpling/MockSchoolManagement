@@ -21,6 +21,12 @@ namespace MockSchoolManagement.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.Seed();
+
+            var foreigKeys = modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys());
+            foreach (var foreignKey in foreigKeys)
+            {
+                foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
+            }
         }
 
     }
