@@ -16,6 +16,8 @@ namespace MockSchoolManagement.Controllers
         {
             _logger = logger;
         }
+
+        [AllowAnonymous]
         [Route("Error/{statusCode}")]
         public IActionResult HttpStatusCodeHandler(int statusCode)
         {
@@ -36,7 +38,6 @@ namespace MockSchoolManagement.Controllers
         }
 
         [AllowAnonymous]
-        [Route("/Error")]
         public IActionResult Error()
         {
             var excptionHandlePathFeature =
