@@ -16,6 +16,8 @@ using MockSchoolManagement.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using MockSchoolManagement.CustomerMiddlewares;
+using Microsoft.AspNetCore.Authorization;
+using MockSchoolManagement.Security;
 
 namespace MockSchoolManagement
 {
@@ -52,10 +54,56 @@ namespace MockSchoolManagement
 
             services.AddMvc(a=>a.EnableEndpointRouting=false)
                 .AddXmlSerializerFormatters();
-            
+
             //services.AddLogging();
             //services.AddControllersWithViews();
-            
+
+            //授权策略
+            services.AddAuthorization(options =>
+            {
+                //策略结合声明授权
+                options.AddPolicy("CreateRolePolicy",
+                  policy => policy.RequireClaim("Create Role","True"));
+
+                //func实现自定义授权
+                options.AddPolicy("EditRolePolicy",
+                    policy => policy.RequireAssertion(context => AuthorizaAccess(context)));
+
+                //策略结合角色授权
+                options.AddPolicy("AdminRolePolicy",
+                   policy => policy.RequireRole("Admin", "Super Admin"));
+
+                ////策略结合多个角色进行授权
+                //options.AddPolicy("SuperAdminPolicy", policy =>
+                //  policy.RequireRole("Super Admin"));
+
+                //自定义授权处理程序
+                options.AddPolicy("CustomEditRolePolicy", policy =>
+                    policy.AddRequirements(new ManageAdminRolesAndClaimsRequirement()));
+
+            });
+
+            services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
+            services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                //拒绝访问
+                options.AccessDeniedPath = new PathString("/Admin/AccessDeied");
+
+                //修改登录地址的路由
+                //   options.LoginPath = new PathString("/Admin/Login");  
+                //修改注销地址的路由
+                //   options.LogoutPath = new PathString("/Admin/LogOut");
+
+                //统一系统全局的Cookie名称
+                options.Cookie.Name = "MockSchoolCookieName";
+                // 登录用户Cookie的有效期 
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);//60分钟
+                //是否对Cookie启用滑动过期时间。
+                options.SlidingExpiration = true;
+
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -129,6 +177,12 @@ namespace MockSchoolManagement
             //{
             //    endpoints.MapRazorPages();
             //});
+        }
+
+        public bool AuthorizaAccess(AuthorizationHandlerContext context)
+        {
+            return context.User.IsInRole("Admin") && context.User.HasClaim(claim => claim.Type == "Edit Role" && claim.Value == "true")
+                || context.User.IsInRole("Super Admin");
         }
     }
 }

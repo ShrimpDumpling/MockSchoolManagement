@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -11,7 +12,7 @@ namespace MockSchoolManagement.ViewModels
     {
         public EditUserViewModel()
         {
-            this.Claims = new List<string>();
+            this.Claims = new List<Claim>();
             this.Roles = new List<string>();
         }
         public string Id { get; set; }
@@ -24,7 +25,7 @@ namespace MockSchoolManagement.ViewModels
         public string Email { get; set; }
 
         public string City { get; set; }
-        public List<string> Claims { get; set; }
+        public IList<Claim> Claims { get; set; }
         public List<string> Roles { get; set; }
     }
 }

@@ -21,14 +21,18 @@ namespace MockSchoolManagement.Controllers
             _studentRepository = studentRepository;
             _webHostEnvironment = webHostEnvironment;
         }
+        [AllowAnonymous]
         public IActionResult Index()
         {
             var model = _studentRepository.GEtAllStudents();
             return View(model);
         }
 
+
+        #region 学生详情页
         //[Route("details/{id?}")]
         //[Route("home/details/{id?}")]
+        [AllowAnonymous]
         public IActionResult Details(int? id)
         {
             var model = new HomeDetailsViewModel()
@@ -44,15 +48,17 @@ namespace MockSchoolManagement.Controllers
 
             return View(model);
         }
+        #endregion
 
-        [Authorize]
+        #region 添加新的学生
+        
         [HttpGet]
         public IActionResult Create()
         {
             return View();
         }
 
-        [Authorize]
+        
         [HttpPost]
         public IActionResult Create(StudentCreateViewModel student)
         {
@@ -72,6 +78,10 @@ namespace MockSchoolManagement.Controllers
             }
             return View();
         }
+        #endregion
+
+        #region 编辑学生
+        
         [HttpGet]
         public IActionResult Edit(int id)
         {
@@ -81,6 +91,7 @@ namespace MockSchoolManagement.Controllers
             return View(model);
         }
 
+        
         [HttpPost]
         public IActionResult Edit(StudentEditViewModel student)
         {
@@ -100,10 +111,15 @@ namespace MockSchoolManagement.Controllers
             }
             return View();
         }
+        #endregion
+
+        #region 删除学生
+        //[Authorize(Policy = "SuperAdminPolicy")]
         public IActionResult Remove(int id)
         {
             _studentRepository.Delete(id);
             return RedirectToAction("Index");
         }
+        #endregion
     }
 }

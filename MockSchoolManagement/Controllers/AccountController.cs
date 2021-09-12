@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MockSchoolManagement.Controllers
 {
-    [AllowAnonymous]
+    
     public class AccountController : Controller
     {
         private UserManager<ApplicationUser> _userManager;
@@ -23,11 +23,17 @@ namespace MockSchoolManagement.Controllers
             _signInManager = signInManager;
         }
 
+        #region 发生错误
+        [AllowAnonymous]
         [HttpGet]
         public IActionResult AccessDenied()
         {
+            //拒绝访问的页面
             return View();
         }
+        #endregion
+
+        #region 登录部分
         [HttpGet]
         public IActionResult Login()
         {
@@ -35,7 +41,7 @@ namespace MockSchoolManagement.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model,string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -53,16 +59,17 @@ namespace MockSchoolManagement.Controllers
                 }
                 ModelState.AddModelError(string.Empty, "登录失败，请重试");
             }
-            
+
             return View(model);
         }
+        #endregion
 
-
-        [AcceptVerbs("Get","Post")]
+        #region 判断邮箱是否已经存在
+        [AcceptVerbs("Get", "Post")]
         public async Task<IActionResult> IsEmailInUse(string email)
         {
             var user = await _userManager.FindByEmailAsync(email);
-            if (user==null)
+            if (user == null)
             {
                 return Json(true);
             }
@@ -71,12 +78,13 @@ namespace MockSchoolManagement.Controllers
                 return Json($"邮箱：{email}已经被注册使用了");
             }
         }
+        #endregion
 
-
+        #region 用户注册
         [HttpGet]
         public IActionResult Register()
         {
-            
+
             return View();
         }
 
@@ -86,14 +94,14 @@ namespace MockSchoolManagement.Controllers
             var user = new ApplicationUser
             {
                 UserName = model.Email,
-                Email=model.Email,
-                City=model.City
+                Email = model.Email,
+                City = model.City
             };
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (result.Succeeded)
             {
-                if (_signInManager.IsSignedIn(User)&&User.IsInRole("Admin"))
+                if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
                 {
                     return RedirectToAction("ListUsers", "Admin");
                 }
@@ -102,17 +110,21 @@ namespace MockSchoolManagement.Controllers
                 return RedirectToAction("index", "home");
             }
 
-            foreach(var error in result.Errors)
+            foreach (var error in result.Errors)
             {
                 ModelState.AddModelError(string.Empty, error.Description);
             }
             return View(model);
         }
+        #endregion
+
+        #region 用户注销
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
             return RedirectToAction("index", "home");
         }
+        #endregion
     }
 }
