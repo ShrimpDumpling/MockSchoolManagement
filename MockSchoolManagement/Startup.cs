@@ -18,6 +18,8 @@ using Microsoft.AspNetCore.Identity;
 using MockSchoolManagement.CustomerMiddlewares;
 using Microsoft.AspNetCore.Authorization;
 using MockSchoolManagement.Security;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 
 namespace MockSchoolManagement
 {
@@ -33,10 +35,27 @@ namespace MockSchoolManagement
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddHttpContextAccessor();
             services.AddScoped<IStudentRepository, SQLStudentRepositry>();
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>();
+
+            
+            services.AddAuthentication()
+                .AddMicrosoftAccount(microsoleOptions =>
+                {
+                    microsoleOptions.ClientId = "3d802b3b-4296-450c-a278-65962830718f";
+                    microsoleOptions.ClientSecret = "o19c0r1t-Bx84_O7N0-.7NVurPHcnbM~C_";
+
+                    microsoleOptions.CorrelationCookie.SameSite = SameSiteMode.Lax;
+                    //microsoleOptions.ClientId = Configuration["Authentication:Microsoft:ClientId"];
+                    //microsoleOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
+
+                });
+            //.AddCookie(p => p.SlidingExpiration = true)
+
+            //services.AddAuthorization();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -52,7 +71,13 @@ namespace MockSchoolManagement
                 options => 
                 options.UseSqlServer(Configuration.GetConnectionString("MockStudentDBConnection")));
 
-            services.AddMvc(a=>a.EnableEndpointRouting=false)
+            services.AddMvc(a=> {
+                a.EnableEndpointRouting = false;
+                var policy = new AuthorizationPolicyBuilder()
+                                              .RequireAuthenticatedUser()
+                                              .Build();
+                a.Filters.Add(new AuthorizeFilter(policy));
+            })
                 .AddXmlSerializerFormatters();
 
             //services.AddLogging();
@@ -86,24 +111,25 @@ namespace MockSchoolManagement
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
 
-            services.ConfigureApplicationCookie(options =>
-            {
-                //拒绝访问
-                options.AccessDeniedPath = new PathString("/Admin/AccessDeied");
+            //services.ConfigureApplicationCookie(options =>
+            //{
+            //    //拒绝访问
+            //    options.AccessDeniedPath = new PathString("/Admin/AccessDeied");
 
-                //修改登录地址的路由
-                //   options.LoginPath = new PathString("/Admin/Login");  
-                //修改注销地址的路由
-                //   options.LogoutPath = new PathString("/Admin/LogOut");
+            //    //修改登录地址的路由
+            //    //   options.LoginPath = new PathString("/Admin/Login");  
+            //    //修改注销地址的路由
+            //    //   options.LogoutPath = new PathString("/Admin/LogOut");
 
-                //统一系统全局的Cookie名称
-                options.Cookie.Name = "MockSchoolCookieName";
-                // 登录用户Cookie的有效期 
-                options.ExpireTimeSpan = TimeSpan.FromMinutes(60);//60分钟
-                //是否对Cookie启用滑动过期时间。
-                options.SlidingExpiration = true;
+            //    //统一系统全局的Cookie名称
+            //    options.Cookie.Name = "MockSchoolCookieName";
+            //    // 登录用户Cookie的有效期 
+            //    options.ExpireTimeSpan = TimeSpan.FromMinutes(60);//60分钟
+            //    //是否对Cookie启用滑动过期时间。
+            //    options.SlidingExpiration = true;
 
-            });
+            //});
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -124,10 +150,9 @@ namespace MockSchoolManagement
             //app.UseDirectoryBrowser();
             //app.UseDefaultFiles();
             //app.UseStaticFiles();
-
-
             app.UseFileServer();
 
+            app.UseCookiePolicy();
             app.UseAuthentication();//授权
             app.UseAuthorization();//验证
 

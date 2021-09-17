@@ -23,11 +23,8 @@
 
 
                 <form method="post" asp-action="DeleteRole" asp-route-id="@role.Id">
-                    @if ((await authorizationService.AuthorizeAsync(User,
-                               "EditRolePlicy")).Succeeded)
-                    {
+
                         <a asp-action="EditRole" asp-controller="Admin" asp-route-id="@role.Id" class="btn btn-primary">编辑</a>
-                    }
 
 
                     <span id="confirmDeleteSpan_@role.Id" style="display:none">

@@ -6,11 +6,12 @@ using MockSchoolManagement.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace MockSchoolManagement.Controllers
 {
-    
+    [AllowAnonymous]
     public class AccountController : Controller
     {
         private UserManager<ApplicationUser> _userManager;
@@ -35,9 +36,14 @@ namespace MockSchoolManagement.Controllers
 
         #region 登录部分
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> LoginAsync(string returnUrl)
         {
-            return View();
+            LoginViewModel model = new LoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList()
+            };
+            return View(model);
         }
 
         [HttpPost]
@@ -61,6 +67,79 @@ namespace MockSchoolManagement.Controllers
             }
 
             return View(model);
+        }
+
+        //第三方登录
+        [HttpPost]
+        public IActionResult ExternalLogin(string provider, string returnUrl)
+        {
+            var redirectUrl = Url.Action("ExternalLoginCallback", "Account",
+                                new { ReturnUrl = returnUrl });
+            var properties = _signInManager
+                .ConfigureExternalAuthenticationProperties(provider, redirectUrl);
+            return new ChallengeResult(provider, properties);
+        }
+
+        //第三方登录的回调
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null,string remoteError=null)
+        {
+            returnUrl = returnUrl ?? Url.Content("~/");
+
+            LoginViewModel loginViewModel = new LoginViewModel
+            {
+                ReturnUrl = returnUrl,
+                ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList(),
+            };
+
+            if (remoteError!=null)
+            {
+                ModelState.AddModelError(string.Empty, $"第三方登录提供程序错误：{remoteError}");
+                return View("Login", loginViewModel);
+            }
+
+            //从第三方登录提供商获取登录信息
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info==null)
+            {
+                ModelState.AddModelError(string.Empty, $"加载第三方登录信息出错。");
+                return View("Login", loginViewModel);
+            }
+
+            //如果之前登录过，表里会有记录，就不需要创建了
+            var signInResult = await _signInManager.ExternalLoginSignInAsync(
+                info.LoginProvider,info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+
+            if (signInResult.Succeeded)
+            {
+                return LocalRedirect(returnUrl);
+            }
+            else
+            {
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                if (email!=null)
+                {
+                    //查询用户是否存在
+                    var user = await _userManager.FindByEmailAsync(email);
+                    if (user==null)
+                    {//用户不存在，创建一个用户
+                        user = new ApplicationUser
+                        {
+                            UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
+                            Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                        };
+                        await _userManager.CreateAsync(user);
+                    }
+                    await _userManager.AddLoginAsync(user, info);
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    return LocalRedirect(returnUrl);
+                }
+
+                ViewBag.ErrorTitle = $"我们无法从提供商：{info.LoginProvider}中解析到读者的邮件地址";
+                ViewBag.ErrorMessage = $"请通过联系Anonyjie@outlook.com寻求技术支持。";
+                return View("Error");
+            }
+
+
         }
         #endregion
 
