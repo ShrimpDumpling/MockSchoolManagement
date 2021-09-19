@@ -58,8 +58,8 @@ namespace MockSchoolManagement.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user!=null&&user.EmailConfirmed &&
-                    (await _userManager.CheckPasswordAsync(user,model.Password)))
+                if (user != null && user.EmailConfirmed &&
+                    (await _userManager.CheckPasswordAsync(user, model.Password)))
                 {//判断邮箱是否已经验证
                     ModelState.AddModelError(string.Empty, $"Email not confirmedyet");
                     return View(model);
@@ -95,7 +95,7 @@ namespace MockSchoolManagement.Controllers
         }
 
         //第三方登录的回调
-        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null,string remoteError=null)
+        public async Task<IActionResult> ExternalLoginCallback(string returnUrl = null, string remoteError = null)
         {
             returnUrl = returnUrl ?? Url.Content("~/");
 
@@ -105,7 +105,7 @@ namespace MockSchoolManagement.Controllers
                 ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList(),
             };
 
-            if (remoteError!=null)
+            if (remoteError != null)
             {
                 ModelState.AddModelError(string.Empty, $"第三方登录提供程序错误：{remoteError}");
                 return View("Login", loginViewModel);
@@ -113,7 +113,7 @@ namespace MockSchoolManagement.Controllers
 
             //从第三方登录提供商获取登录信息
             var info = await _signInManager.GetExternalLoginInfoAsync();
-            if (info==null)
+            if (info == null)
             {
                 ModelState.AddModelError(string.Empty, $"加载第三方登录信息出错。");
                 return View("Login", loginViewModel);
@@ -121,7 +121,7 @@ namespace MockSchoolManagement.Controllers
 
             //如果之前登录过，表里会有记录，就不需要创建了
             var signInResult = await _signInManager.ExternalLoginSignInAsync(
-                info.LoginProvider,info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
+                info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
 
             if (signInResult.Succeeded)
             {
@@ -130,11 +130,11 @@ namespace MockSchoolManagement.Controllers
             else
             {
                 var email = info.Principal.FindFirstValue(ClaimTypes.Email);
-                if (email!=null)
+                if (email != null)
                 {
                     //查询用户是否存在
                     var user = await _userManager.FindByEmailAsync(email);
-                    if (user==null)
+                    if (user == null)
                     {//用户不存在，创建一个用户
                         user = new ApplicationUser
                         {
@@ -187,17 +187,17 @@ namespace MockSchoolManagement.Controllers
         }
         #endregion
 
-        #region 确认电子邮箱
+        #region 确认电子邮箱(激活)
         [HttpGet]
-        public async Task<IActionResult> ConfirmEmail(string userId,string token)
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
         {
-            if (userId==null&&token==null)
+            if (userId == null && token == null)
             {
                 return RedirectToAction("index", "home");
             }
 
             var user = await _userManager.FindByIdAsync(userId);
-            if (user==null)
+            if (user == null)
             {
                 ViewBag.ErrorMessage = $"当前{userId}无效";
                 return View("NotFound");
@@ -227,7 +227,7 @@ namespace MockSchoolManagement.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user!=null)
+                if (user != null)
                 {
                     if (!await _userManager.IsEmailConfirmedAsync(user))
                     {// 没有激活过的邮箱
@@ -251,6 +251,45 @@ namespace MockSchoolManagement.Controllers
 
         #endregion
 
+        #region 重置密码
+        [HttpGet]
+        public IActionResult ResetPassword(string token, string email)
+        {
+            if (token == null || email == null)
+            {
+                ModelState.AddModelError(string.Empty, "无效的密码重置令牌");
+            }
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user!=null)
+                {
+                    var result = await 
+                        _userManager.ResetPasswordAsync(user, model.Token, model.Password);
+                    if (result.Succeeded)
+                    {
+                        return View("ResetPasswordConfirmation");
+                    }
+                    //如果失败
+
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View(model);
+                }
+                //为了避免枚举攻击，不要提示用户不存在
+                return View("ResetPasswordConfirmation");
+
+            }
+            return View(model);
+        }
+        #endregion
         #region 用户注册
         [HttpGet]
         public IActionResult Register()
