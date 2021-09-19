@@ -39,7 +39,8 @@ namespace MockSchoolManagement
             services.AddScoped<IStudentRepository, SQLStudentRepositry>();
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
-                .AddErrorDescriber<CustomIdentityErrorDescriber>();
+                .AddErrorDescriber<CustomIdentityErrorDescriber>()
+                .AddDefaultTokenProviders();
 
             
             services.AddAuthentication()
@@ -63,6 +64,10 @@ namespace MockSchoolManagement
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
+
+
+                options.SignIn.RequireConfirmedEmail = true;
+
             });
 
 

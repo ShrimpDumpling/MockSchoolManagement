@@ -1,0 +1,25 @@
+﻿<h3>您的电子邮箱已经验证成功</h3>
+
+
+<h2 id="AutoGoHome">n秒后自动返回首页</h2>
+
+
+@section Scripts{
+    <script>
+
+        var h2 = $("#AutoGoHome");
+        var timeout = 8;
+
+        var AutoGoHmoe = setInterval(SetTitle, 1000);
+
+        function SetTitle() {
+            timeout--;
+            if (timeout < 0) {
+                $("#GoHome")[0].click();
+                window.clearInterval(AutoGoHmoe);
+            }
+            h2[0].innerText = (timeout + "秒后自动返回首页");
+            //h2[0].innerText = (timeout + "秒后自动返回首页");
+        }
+    </script>
+}

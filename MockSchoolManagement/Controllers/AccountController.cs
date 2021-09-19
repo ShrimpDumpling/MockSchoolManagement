@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using MockSchoolManagement.Models;
 using MockSchoolManagement.ViewModels;
 using System;
@@ -14,12 +15,15 @@ namespace MockSchoolManagement.Controllers
     [AllowAnonymous]
     public class AccountController : Controller
     {
+        private readonly ILogger<AccountController> _logger;
         private UserManager<ApplicationUser> _userManager;
         private SignInManager<ApplicationUser> _signInManager;
 
         public AccountController(UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            ILogger<AccountController> logger)
         {
+            _logger = logger;
             _userManager = userManager;
             _signInManager = signInManager;
         }
@@ -36,7 +40,7 @@ namespace MockSchoolManagement.Controllers
 
         #region 登录部分
         [HttpGet]
-        public async Task<IActionResult> LoginAsync(string returnUrl)
+        public async Task<IActionResult> Login(string returnUrl)
         {
             LoginViewModel model = new LoginViewModel
             {
@@ -49,13 +53,23 @@ namespace MockSchoolManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            model.ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
+
             if (ModelState.IsValid)
             {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user!=null&&user.EmailConfirmed &&
+                    (await _userManager.CheckPasswordAsync(user,model.Password)))
+                {//判断邮箱是否已经验证
+                    ModelState.AddModelError(string.Empty, $"Email not confirmedyet");
+                    return View(model);
+                }
+
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
                 if (result.Succeeded)
                 {
                     if (!string.IsNullOrEmpty(returnUrl))
-                    {
+                    {//判断是否有登陆前的页面地址
                         return Redirect(returnUrl);
                     }
                     else
@@ -126,8 +140,22 @@ namespace MockSchoolManagement.Controllers
                         {
                             UserName = info.Principal.FindFirstValue(ClaimTypes.Email),
                             Email = info.Principal.FindFirstValue(ClaimTypes.Email),
+                            EmailConfirmed = true,
                         };
                         await _userManager.CreateAsync(user);
+
+                        //生成电子邮件确认令牌
+                        var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+
+                        //生成电子邮件的确认链接
+                        var confirmationLink = Url.Action("ConfirmEmail", "Account",
+                        new { userId = user.Id, token = token }, Request.Scheme);
+                        //需要注入ILogger<AccountController> _logger;服务，记录生成的URL链接
+                        _logger.Log(LogLevel.Warning, confirmationLink);
+                        ViewBag.ErrorTitle = "注册成功";
+                        ViewBag.ErrorMessage = $"在你登入系统前,我们已经给您发了一份邮件，需要您先进行邮件验证，点击确认链接即可完成。";
+                        return View("Error");
+
                     }
                     await _userManager.AddLoginAsync(user, info);
                     await _signInManager.SignInAsync(user, isPersistent: false);
@@ -159,41 +187,117 @@ namespace MockSchoolManagement.Controllers
         }
         #endregion
 
+        #region 确认电子邮箱
+        [HttpGet]
+        public async Task<IActionResult> ConfirmEmail(string userId,string token)
+        {
+            if (userId==null&&token==null)
+            {
+                return RedirectToAction("index", "home");
+            }
+
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user==null)
+            {
+                ViewBag.ErrorMessage = $"当前{userId}无效";
+                return View("NotFound");
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return View();
+            }
+            ViewBag.Title = "您的电子邮箱还未经行验证";
+            return View("Error");
+
+        }
+        #endregion
+
+        #region 重发激活邮件
+        [HttpGet]
+        public IActionResult ActivateUserEmail()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ActivateUserEmail(EmailAddressViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user!=null)
+                {
+                    if (!await _userManager.IsEmailConfirmedAsync(user))
+                    {// 没有激活过的邮箱
+                        var getoken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                        var confirmatioLine = Url.Action("ConfirmEmail", "Account",
+                            new { userId = user.Id, token = getoken }, Request.Scheme);
+                        // 写入日志
+                        _logger.Log(LogLevel.Warning, confirmatioLine);
+
+                        ViewBag.Message = "您在在我们的系统中已经有注册账户，我们已经发送邮件到您的邮箱中，请前往邮箱激活您的账户";
+                        return View("ActivateUserEmailConfirmation", ViewBag.Message);
+                    }
+
+
+
+                }
+            }
+            ViewBag.Message = "请确认邮箱是否存在异常，现在我们无法给您发送激活链接。";
+            return View("ActivateUserEmailConfirmation", ViewBag.Message);
+        }
+
+        #endregion
+
         #region 用户注册
         [HttpGet]
         public IActionResult Register()
         {
-
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var user = new ApplicationUser
+            if (ModelState.IsValid)
             {
-                UserName = model.Email,
-                Email = model.Email,
-                City = model.City
-            };
-            var result = await _userManager.CreateAsync(user, model.Password);
-
-            if (result.Succeeded)
-            {
-                if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                var user = new ApplicationUser
                 {
-                    return RedirectToAction("ListUsers", "Admin");
+                    UserName = model.Email,
+                    Email = model.Email,
+                    City = model.City
+                };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {//用户数据写入成功
+                    //获取邮箱token,并且生成邮箱验证链接
+                    var getoken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+                    var confirmatioLine = Url.Action("ConfirmEmail", "Account",
+                        new { userId = user.Id, token = getoken }, Request.Scheme);
+                    // 写入日志
+                    _logger.Log(LogLevel.Warning, confirmatioLine);
+
+                    if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {//如果是管理员创建的用户
+                        return RedirectToAction("ListUsers", "Admin");
+                    }
+                    ViewBag.ErrorTitle = "注册成功";
+                    ViewBag.ErrorMessage = $"在你登入系统前,我们已经给您发了一份邮件，需要您先进行邮件验证，点击确认链接即可完成。";
+                    return View("Error");
+
+                    //await _signInManager.SignInAsync(user, isPersistent: false);
+                    //return RedirectToAction("index", "home");
                 }
 
-                await _signInManager.SignInAsync(user, isPersistent: false);
-                return RedirectToAction("index", "home");
+                //登录失败
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(string.Empty, error.Description);
+                }
             }
-
-            foreach (var error in result.Errors)
-            {
-                ModelState.AddModelError(string.Empty, error.Description);
-            }
-            return View(model);
+            return View(model);//失败了走到这里
         }
         #endregion
 
