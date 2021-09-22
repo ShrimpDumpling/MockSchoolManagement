@@ -61,7 +61,7 @@ namespace MockSchoolManagement.Controllers
                 if (user != null && user.EmailConfirmed &&
                     (await _userManager.CheckPasswordAsync(user, model.Password)))
                 {//判断邮箱是否已经验证
-                    ModelState.AddModelError(string.Empty, $"Email not confirmedyet");
+                    ModelState.AddModelError(string.Empty, $"您的电子邮箱还未进行验证。");
                     return View(model);
                 }
 
@@ -77,6 +77,12 @@ namespace MockSchoolManagement.Controllers
                         return RedirectToAction("index", "home");
                     }
                 }
+
+                if (result.IsLockedOut)
+                {
+                    return View("AccountLocked");
+                }
+
                 ModelState.AddModelError(string.Empty, "登录失败，请重试");
             }
 
@@ -270,6 +276,11 @@ namespace MockSchoolManagement.Controllers
                         _userManager.ResetPasswordAsync(user, model.Token, model.Password);
                     if (result.Succeeded)
                     {
+                        if (await _userManager.IsLockedOutAsync(user))
+                        {// 判断是否锁定状态，如果锁定就直接结束账户锁定
+                            await _userManager.SetLockoutEndDateAsync(user,
+                                DateTimeOffset.UtcNow);
+                        }
                         return View("ResetPasswordConfirmation");
                     }
                     //如果失败

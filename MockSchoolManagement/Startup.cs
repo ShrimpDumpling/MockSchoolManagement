@@ -73,6 +73,10 @@ namespace MockSchoolManagement
 
                 options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
                 //覆盖原有的邮箱处理规则
+
+                // 10次登录失败以后会锁定30分钟的规则
+                options.Lockout.MaxFailedAccessAttempts = 10;
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
             });
 
             services.ConfigureApplicationCookie(o => {
