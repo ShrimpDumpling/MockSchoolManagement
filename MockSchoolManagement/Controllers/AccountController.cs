@@ -290,13 +290,23 @@ namespace MockSchoolManagement.Controllers
 
         #region 修改密码
         [HttpGet]
-        public ActionResult ChangePassword()
+        public async Task<ActionResult> ChangePassword()
         {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return View("Login");
+            }
+            var userHasPassword = await _userManager.HasPasswordAsync(user);
+            if (!userHasPassword)
+            {// 没有密码时会跳转到增加密码
+                return RedirectToAction("AddPassword");
+            }
             return View();
         }
 
         [HttpPost]
-        public async Task<ActionResult> ChangePasswordAsync(ChangePasswordViewModel model)
+        public async Task<ActionResult> ChangePassword(ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -318,6 +328,49 @@ namespace MockSchoolManagement.Controllers
                 // 更改密码成功会刷新Cookie
                 await _signInManager.RefreshSignInAsync(user);
                 return View("ChangePasswordConfirmation");
+            }
+            return View(model);
+        }
+        #endregion
+
+        #region 第三方用户添加密码
+        [HttpGet]
+        public async Task<IActionResult> AddPassword()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user==null)
+            {
+                return View("Login");
+            }
+            var userHasPassword = await _userManager.HasPasswordAsync(user);
+            if (userHasPassword)
+            {//已经有密码了会跳转到修改密码
+                return RedirectToAction("ChangePassword");
+            }
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddPassword(AddPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return View("Login");
+                }
+                var result = await _userManager.AddPasswordAsync(user, model.NewPassword);
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View();
+                }
+                //刷新当前用户的cookie
+                await _signInManager.RefreshSignInAsync(user);
+                return View("AddPasswordCofirmation");
             }
             return View(model);
         }
