@@ -240,9 +240,6 @@ namespace MockSchoolManagement.Controllers
                         ViewBag.Message = "您在在我们的系统中已经有注册账户，我们已经发送邮件到您的邮箱中，请前往邮箱激活您的账户";
                         return View("ActivateUserEmailConfirmation", ViewBag.Message);
                     }
-
-
-
                 }
             }
             ViewBag.Message = "请确认邮箱是否存在异常，现在我们无法给您发送激活链接。";
@@ -290,6 +287,42 @@ namespace MockSchoolManagement.Controllers
             return View(model);
         }
         #endregion
+
+        #region 修改密码
+        [HttpGet]
+        public ActionResult ChangePassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult> ChangePasswordAsync(ChangePasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.GetUserAsync(User);
+                if (user==null)
+                {
+                    return RedirectToAction("Login");
+                }
+                var result = await _userManager.ChangePasswordAsync(user,
+                    model.CurrentPassword, model.NewPassword);
+                if (!result.Succeeded)
+                {//不成功的逻辑
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                    return View();
+                }
+                // 更改密码成功会刷新Cookie
+                await _signInManager.RefreshSignInAsync(user);
+                return View("ChangePasswordConfirmation");
+            }
+            return View(model);
+        }
+        #endregion
+
         #region 用户注册
         [HttpGet]
         public IActionResult Register()

@@ -28,7 +28,7 @@ namespace MockSchoolManagement.DataRepositories
             return student;
         }
 
-        public IEnumerable<Student> GEtAllStudents()
+        public IEnumerable<Student> GetAllStudents()
         {
             
             return _context.Students;

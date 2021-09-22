@@ -31,9 +31,9 @@
                 <th>@student.Email</th>
                 <th>@student.Major.GetDisplayName()</th>
                 <th>
-                    <a asp-controller="home" asp-action="details" asp-route-id="@student.Id" class="btn btn-primary m-1">查看</a>
-                    <a asp-controller="home" asp-action="edit" asp-route-id="@student.Id" class="btn btn-primary m-1">编辑</a>
-                    <a asp-controller="home" asp-action="remove" asp-route-id="@student.Id" class="btn btn-primary m-1">删除</a>
+                    <a asp-controller="home" asp-action="details" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">查看</a>
+                    <a asp-controller="home" asp-action="edit" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">编辑</a>
+                    <a asp-controller="home" asp-action="remove" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">删除</a>
                 </th>
             </tr>
         }

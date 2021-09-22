@@ -19,7 +19,7 @@ namespace MockSchoolManagement.DataRepositories
         /// 获取所有学生信息
         /// </summary>
         /// <returns></returns>
-        IEnumerable<Student> GEtAllStudents();
+        IEnumerable<Student> GetAllStudents();
         /// <summary>
         /// 添加学生信息
         /// </summary>

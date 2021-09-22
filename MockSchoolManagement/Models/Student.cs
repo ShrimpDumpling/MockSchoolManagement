@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using MockSchoolManagement.Models.EnumTypes;
@@ -27,5 +28,8 @@ namespace MockSchoolManagement.Models
         public string PhotoPath { get; set; }
 
 
+        //这个字段用于Controller加密路由id，不需要储存到数据库里
+        [NotMapped]
+        public string EncryptedId { get; set; }
     }
 }

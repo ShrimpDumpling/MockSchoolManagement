@@ -20,6 +20,8 @@ using Microsoft.AspNetCore.Authorization;
 using MockSchoolManagement.Security;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
+using MockSchoolManagement.Security.CustomTokenProvider;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace MockSchoolManagement
 {
@@ -40,9 +42,12 @@ namespace MockSchoolManagement
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddErrorDescriber<CustomIdentityErrorDescriber>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddTokenProvider<CustomEmailConfirmationTokenProvider<ApplicationUser>>
+                ("CustomEmailConfirmation");
 
-            
+            services.AddSingleton<DataProtectionPurposeStrings>();
+
             services.AddAuthentication()
                 .AddMicrosoftAccount(microsoleOptions =>
                 {
@@ -64,11 +69,19 @@ namespace MockSchoolManagement
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequireLowercase = false;
                 options.Password.RequireUppercase = false;
+                options.SignIn.RequireConfirmedEmail = true;//强制验证邮箱后登录
 
-
-                options.SignIn.RequireConfirmedEmail = true;
-
+                options.Tokens.EmailConfirmationTokenProvider = "CustomEmailConfirmation";
+                //覆盖原有的邮箱处理规则
             });
+
+            services.ConfigureApplicationCookie(o => {
+                o.ExpireTimeSpan = TimeSpan.FromDays(5);//cookie活动超时
+                o.SlidingExpiration = true;
+            });
+            services.Configure<DataProtectionTokenProviderOptions>(o =>
+            o.TokenLifespan = TimeSpan.FromHours(3));//自定义令牌有效期
+
 
 
             //services.AddRazorPages();
@@ -115,6 +128,9 @@ namespace MockSchoolManagement
 
             services.AddSingleton<IAuthorizationHandler, CanEditOnlyOtherAdminRolesAndClaimsHandler>();
             services.AddSingleton<IAuthorizationHandler, SuperAdminHandler>();
+
+            
+
 
             //services.ConfigureApplicationCookie(options =>
             //{

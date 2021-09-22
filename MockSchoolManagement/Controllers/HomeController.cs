@@ -9,6 +9,8 @@ using MockSchoolManagement.ViewModels;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using MockSchoolManagement.Security.CustomTokenProvider;
 
 namespace MockSchoolManagement.Controllers
 {
@@ -16,15 +18,30 @@ namespace MockSchoolManagement.Controllers
     {
         private readonly IStudentRepository _studentRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public HomeController(IStudentRepository studentRepository, IWebHostEnvironment webHostEnvironment)
+        private readonly IDataProtector _Protector;
+
+        public HomeController(IStudentRepository studentRepository, 
+            IWebHostEnvironment webHostEnvironment,
+            IDataProtectionProvider dataProtector, 
+            DataProtectionPurposeStrings dataProtectionPurposeStrings)
         {
             _studentRepository = studentRepository;
             _webHostEnvironment = webHostEnvironment;
+            _Protector = dataProtector.CreateProtector(
+                dataProtectionPurposeStrings.StudentIdRouteValue);
         }
+
+
         [AllowAnonymous]
         public IActionResult Index()
         {
-            var model = _studentRepository.GEtAllStudents();
+            List<Student> model = _studentRepository.GetAllStudents()
+                .Select(s=>
+                {//加密了学生ID作为路由放入viewmodel中
+                    s.EncryptedId = _Protector.Protect(s.Id.ToString());
+                    return s;
+                }).ToList();
+
             return View(model);
         }
 
@@ -33,18 +50,36 @@ namespace MockSchoolManagement.Controllers
         //[Route("details/{id?}")]
         //[Route("home/details/{id?}")]
         [AllowAnonymous]
-        public IActionResult Details(int? id)
+        public IActionResult Details(string id)
         {
+            Student student;
+            try
+            {
+                //先解密加密过的路由id
+                string decryptedId = _Protector.Unprotect(id);
+                int decyuptedStudentId = Convert.ToInt32(decryptedId);
+                student = _studentRepository.GetStudent(decyuptedStudentId);
+            }
+            catch
+            {//解密过程抛出Exception的解决方法
+                ViewBag.ErrorMessage = $"学生Id={id}的信息不存在，请重试";
+                return View("NotFound");
+            }
+            if (student==null)
+            {//什么卵都没查出来
+                ViewBag.ErrorMessage = $"学生Id={id}的信息不存在，请重试";
+                return View("NotFound");
+            }
             var model = new HomeDetailsViewModel()
             {
                 PageTitle = "Details Page",
-                Student = _studentRepository.GetStudent(id??1)
+                Student = student
             };
-            if (model.Student==null)
-            {
-                Response.StatusCode = 404;
-                return View("StudentNotFound", id);
-            }
+            //if (model.Student==null)
+            //{
+            //    Response.StatusCode = 404;
+            //    return View("StudentNotFound", id);
+            //}
 
             return View(model);
         }
