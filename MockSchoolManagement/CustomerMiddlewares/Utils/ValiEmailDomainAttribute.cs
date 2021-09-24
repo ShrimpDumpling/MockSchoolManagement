@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace MockSchoolManagement.CustomerMiddlewares.Utils
 {
+    //自定义邮箱验证
     public class ValiEmailDomainAttribute:ValidationAttribute
     {
         private readonly string allowedDomain;
