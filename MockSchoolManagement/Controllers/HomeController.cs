@@ -95,19 +95,28 @@ namespace MockSchoolManagement.Controllers
 
         
         [HttpPost]
-        public IActionResult Create(StudentCreateViewModel student)
+        public IActionResult Create(StudentCreateViewModel model)
         {
             if (ModelState.IsValid)
             {
                 string uniqueFileName = null;
-                if (student.Photo!=null)
-                {
+                if (model.Photo!=null)
+                {//判断是否有新上传图片的逻辑
                     string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "image");
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + student.Photo.FileName;
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.Photo.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    student.Photo.CopyTo(new FileStream(filePath, FileMode.Create));
-                    student.PhotoPath = uniqueFileName;
+                    model.Photo.CopyTo(new FileStream(filePath, FileMode.Create));
+                    //model.PhotoPath = uniqueFileName;
                 }
+                Student student = new Student {
+                    Id=model.Id,
+                    Name=model.Name,
+                    Email=model.Email,
+                    PhotoPath=uniqueFileName,
+                    Major=model.Major
+                };
+
+
                 Student newStudent = _studentRepository.Insert(student);
                 return RedirectToAction("Details", new { id = newStudent.Id });
             }
@@ -128,19 +137,29 @@ namespace MockSchoolManagement.Controllers
 
         
         [HttpPost]
-        public IActionResult Edit(StudentEditViewModel student)
+        public IActionResult Edit(StudentEditViewModel model)
         {
             if (ModelState.IsValid)
             {
-                if (student.ExistingPhotoPath!=null)
+                if (model.ExistingPhotoPath!=null)
                 {
                     string uniqueFileName = null;
                     string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "image");
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + student.ExistingPhotoPath.FileName;
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ExistingPhotoPath.FileName;
                     string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    student.ExistingPhotoPath.CopyTo(new FileStream(filePath, FileMode.Create));
-                    student.PhotoPath = uniqueFileName;
+                    model.ExistingPhotoPath.CopyTo(new FileStream(filePath, FileMode.Create));
+                    model.PhotoPath = uniqueFileName;
                 }
+                Student student = new Student
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Email = model.Email,
+                    Major = model.Major,
+                    PhotoPath = model.PhotoPath,
+                };
+
+
                 Student updateStudent = _studentRepository.Update(student);
                 return RedirectToAction("Details", new { id = updateStudent.Id });
             }
