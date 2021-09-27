@@ -47,6 +47,8 @@ namespace MockSchoolManagement
                 ("CustomEmailConfirmation");
 
             services.AddSingleton<DataProtectionPurposeStrings>();
+            services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
+
 
             services.AddAuthentication()
                 .AddMicrosoftAccount(microsoleOptions =>

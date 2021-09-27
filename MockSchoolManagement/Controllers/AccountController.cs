@@ -58,7 +58,7 @@ namespace MockSchoolManagement.Controllers
             if (ModelState.IsValid)
             {
                 var user = await _userManager.FindByEmailAsync(model.Email);
-                if (user != null && user.EmailConfirmed &&
+                if (user != null && !user.EmailConfirmed &&
                     (await _userManager.CheckPasswordAsync(user, model.Password)))
                 {//判断邮箱是否已经验证
                     ModelState.AddModelError(string.Empty, $"您的电子邮箱还未进行验证。");
