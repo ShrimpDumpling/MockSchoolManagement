@@ -3,7 +3,19 @@
     ViewBag.Title = "学生详情页面";
 
 }
+<h1>学生列表</h1>
 
+<form asp-action="index" method="post">
+    <div>
+        <p>
+            请输入名称：
+            <input type="text" name="serchString" value="@ViewBag.CurrentFiler" />
+            <input type="submit" value="查询" class="btn btn-outline-dark" />
+            <a asp-action="index">返回所有列表</a>
+            <a asp-action="Create">添加学生</a>
+        </p>
+    </div>
+</form>
 
 <div class="row">
     <table class="table table-bordered table-striped">
@@ -11,10 +23,22 @@
             <tr>
                 @*<th scope="col">Id</th>*@
                 <th scope="col">Phot</th>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Major</th>
-                <th scope="col">EnrollmentDate</th>
+                <th scope="col">
+                    <a asp-action="index" asp-route-sortby="Name">Name</a>
+                    <a class="pl-3" asp-action="index" asp-all-route-sortby="Name desc">降序</a>
+                </th>
+                <th scope="col">
+                    <a asp-action="index" asp-route-sortby="Email">Email</a>
+                    <a class="pl-3" asp-action="index" asp-all-route-sortby="Email desc">降序</a>
+                th>
+                <th scope="col">
+                    <a asp-action="index" asp-route-sortby="Email">Major</a>
+                    <a class="pl-3" asp-action="index" asp-all-route-sortby="Major desc">降序</a>
+                </th>
+                <th scope="col">
+                    <a asp-action="index" asp-route-sortby="Email">EnrollmentDate</a>
+                    <a class="pl-3" asp-action="index" asp-all-route-sortby="EnrollmentDate desc">降序</a>
+                </th>
                 <th scope="col">Modify</th>
             </tr>
         </thead>

@@ -7,11 +7,13 @@ using MockSchoolManagement.Models;
 using MockSchoolManagement.DataRepositories;
 using MockSchoolManagement.ViewModels;
 using System.IO;
+using System.Linq.Dynamic.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using MockSchoolManagement.Security.CustomTokenProvider;
 using MockSchoolManagement.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 namespace MockSchoolManagement.Controllers
 {
@@ -69,10 +71,30 @@ namespace MockSchoolManagement.Controllers
         #endregion
 
         [AllowAnonymous]
-        public IActionResult Index()
+        public IActionResult Index(int? pageNumber,int pageSize=10,string sortBy="Id")
         {
-            List<Student> model = _studentRepository.GetAllList()
+            IQueryable<Student> query = _studentRepository.GetAll().OrderBy(sortBy).AsNoTracking();
+            List<Student> model = query.ToList()
                 .Select(s=>
+                {//加密了学生ID作为路由放入viewmodel中
+                    s.EncryptedId = _Protector.Protect(s.Id.ToString());
+                    return s;
+                }).ToList();
+
+            return View(model);
+        }
+        public async Task<IActionResult> Index(string searchString,string sortBy = "Id")
+        {
+            ViewBag.CurrentFilter = searchString?.Trim();
+            IQueryable<Student> query = _studentRepository.GetAll();
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                query = query.Where(s => s.Name.Contains(searchString)
+                                       || s.Email.Contains(searchString));
+            }
+            query = query.OrderBy(sortBy).AsNoTracking();
+            List<Student> model = query.ToList()
+                .Select(s =>
                 {//加密了学生ID作为路由放入viewmodel中
                     s.EncryptedId = _Protector.Protect(s.Id.ToString());
                     return s;
