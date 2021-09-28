@@ -1,15 +1,16 @@
-﻿
-@*@inject IStudentRepository _studentRepository;*@
-
-@model StudentEditViewModel;
-@{ ViewBag.Title = "修改学生信息";
+﻿@model StudentEditViewModel;
+@{ 
+    ViewBag.Title = "修改学生信息";
     var photoPath = "~/image/" + (Model.PhotoPath ?? "exw.gif");
-    }
+}
 
 
-<form asp-controller="home" asp-action="edit" method="post" class="mt-3"
-      enctype="multipart/form-data">
+<form asp-controller="home" asp-action="edit" method="post" class="mt-3" enctype="multipart/form-data">
     <div asp-validation-summary="All" class="text-danger"></div>
+
+    <input hidden asp-for="Id" type="text" value="@Model.Id"/>
+    <input hidden asp-for="PhotoPath" />
+
     <div class="form-group row">
         <label asp-for="Name" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
@@ -17,6 +18,7 @@
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
     </div>
+
     <div class="form-group row">
         <label asp-for="Email" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
@@ -24,6 +26,15 @@
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
     </div>
+
+    <div class="form-group row">
+        <label asp-for="EnrollmentDate" class="col-sm-2 col-form-label"></label>
+        <div class="col-sm-10">
+            <input asp-for="EnrollmentDate" class="form-control" placeholder="入学时间" type="date" />
+            <span asp-validation-for="EnrollmentDate" class="text-danger"></span>
+        </div>
+    </div>
+
     <div class="form-group row">
         <label asp-for="Major" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
@@ -35,29 +46,28 @@
             <span asp-validation-for="Major" class="text-danger"></span>
         </div>
     </div>
+
     <div class="form-group row">
         <label asp-for="ExistingPhotoPath" class="col-sm-2 col-form-label"></label>
         <div class="col-sm-10">
             <div class="custom-file">
                 <input asp-for="ExistingPhotoPath" class="form-control custom-file-input" />
                 <label class="custom-file-label">请选择图片....</label>
-                <input asp-for="PhotoPath" class="form-control" placeholder="PhotoPath" 
-                       style="display:none"/>
             </div>
         </div>
     </div>
+
+    <div class="form-group row col-sm-4 offset-4">
+        <img class="imageThumbnail" src="@photoPath" asp-append-version="true" />
+    </div>
+
     <div class="form-group row">
         <div class="col-sm-10">
-            
-            <img class="card-img-top" src="@photoPath"
-                 asp-append-version="true" />
+            <button type="submit" class="btn btn-primary">更新</button>
+            <a asp-action="index" asp-controller="home" class="btn btn-primary">取消</a>
         </div>
     </div>
-    <div class="form-group row">
-        <div class="col-sm-10">
-            <button type="submit" class="btn btn-primary">修改</button>
-        </div>
-    </div>
+
 </form>
 
 @section Scripts {
@@ -68,7 +78,6 @@
                 var fileLabel = $(this).next(".custom-file-label");
                 var files = $(this)[0].files;
                 fileLabel.html(files[0].name);
-
             });
         });
     </script>

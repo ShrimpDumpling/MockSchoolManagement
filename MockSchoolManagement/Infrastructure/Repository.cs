@@ -12,7 +12,11 @@ namespace MockSchoolManagement.Infrastructure
     public class Repository<TEntity, TPrimaryKey> : IRepository<TEntity, TPrimaryKey>
         where TEntity:class
     {
+
         protected readonly AppDbContext _dbContext;
+        /// <summary>
+        /// 通过泛型，从数据库上下文中获取领域模型
+        /// </summary>
         public virtual DbSet<TEntity> Table => _dbContext.Set<TEntity>();
         public Repository(AppDbContext appDbContext)
         {
@@ -95,6 +99,7 @@ namespace MockSchoolManagement.Infrastructure
         {
             AttachIfNot(entity);
             _dbContext.Entry(entity).State = EntityState.Modified;
+            //Table.Update(entity);
             await this.SaveAsync();
             return entity;
         }
@@ -177,12 +182,14 @@ namespace MockSchoolManagement.Infrastructure
         {
             var entry = _dbContext.ChangeTracker.Entries()
                 .FirstOrDefault(ent => ent.Entity == entity);
-            if (entity!=null)
+
+            if (entry != null)
             {
                 return;
             }
             Table.Attach(entity);
         }
+
         protected void Save()
         {
             _dbContext.SaveChanges();

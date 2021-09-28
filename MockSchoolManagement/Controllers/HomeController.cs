@@ -11,16 +11,17 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using MockSchoolManagement.Security.CustomTokenProvider;
+using MockSchoolManagement.Infrastructure;
 
 namespace MockSchoolManagement.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly IStudentRepository _studentRepository;
+        private readonly IRepository<Student, int> _studentRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IDataProtector _Protector;
 
-        public HomeController(IStudentRepository studentRepository, 
+        public HomeController(IRepository<Student,int> studentRepository, 
             IWebHostEnvironment webHostEnvironment,
             IDataProtectionProvider dataProtector, 
             DataProtectionPurposeStrings dataProtectionPurposeStrings)
@@ -32,10 +33,45 @@ namespace MockSchoolManagement.Controllers
         }
 
 
+        #region 工具方法
+        private Student DecryptedStudent(string id)
+        {
+            Student student;
+            try
+            {
+                //先解密加密过的路由id
+                string decryptedId = _Protector.Unprotect(id);
+                int decyuptedStudentId = Convert.ToInt32(decryptedId);
+                student = _studentRepository.FirstOrDefalult(s => s.Id == decyuptedStudentId);
+            }
+            catch
+            {
+                return null;
+            }
+            return student;
+        }
+        private async Task<Student> DecryptedStudentAsync(string id)
+        {
+            Student student;
+            try
+            {
+                //先解密加密过的路由id
+                string decryptedId = _Protector.Unprotect(id);
+                int decyuptedStudentId = Convert.ToInt32(decryptedId);
+                student = await _studentRepository.FirstOrDefalultAsync(s => s.Id == decyuptedStudentId);
+            }
+            catch
+            {
+                return null;
+            }
+            return student;
+        }
+        #endregion
+
         [AllowAnonymous]
         public IActionResult Index()
         {
-            List<Student> model = _studentRepository.GetAllStudents()
+            List<Student> model = _studentRepository.GetAllList()
                 .Select(s=>
                 {//加密了学生ID作为路由放入viewmodel中
                     s.EncryptedId = _Protector.Protect(s.Id.ToString());
@@ -45,26 +81,26 @@ namespace MockSchoolManagement.Controllers
             return View(model);
         }
 
-
         #region 学生详情页
         //[Route("details/{id?}")]
         //[Route("home/details/{id?}")]
         [AllowAnonymous]
         public IActionResult Details(string id)
         {
-            Student student;
-            try
-            {
-                //先解密加密过的路由id
-                string decryptedId = _Protector.Unprotect(id);
-                int decyuptedStudentId = Convert.ToInt32(decryptedId);
-                student = _studentRepository.GetStudent(decyuptedStudentId);
-            }
-            catch
-            {//解密过程抛出Exception的解决方法
-                ViewBag.ErrorMessage = $"学生Id={id}的信息不存在，请重试";
-                return View("NotFound");
-            }
+            //Student student;
+            //try
+            //{
+            //    //先解密加密过的路由id
+            //    string decryptedId = _Protector.Unprotect(id);
+            //    int decyuptedStudentId = Convert.ToInt32(decryptedId);
+            //    student = _studentRepository.GetStudent(decyuptedStudentId);
+            //}
+            //catch
+            //{//解密过程抛出Exception的解决方法
+            //    ViewBag.ErrorMessage = $"学生Id={id}的信息不存在，请重试";
+            //    return View("NotFound");
+            //}
+            Student student = this.DecryptedStudent(id);
             if (student==null)
             {//什么卵都没查出来
                 ViewBag.ErrorMessage = $"学生Id={id}的信息不存在，请重试";
@@ -113,12 +149,15 @@ namespace MockSchoolManagement.Controllers
                     Name=model.Name,
                     Email=model.Email,
                     PhotoPath=uniqueFileName,
-                    Major=model.Major
+                    Major=model.Major,
+                    EnrollmentDate=model.EnrollmentDate
                 };
 
 
                 Student newStudent = _studentRepository.Insert(student);
-                return RedirectToAction("Details", new { id = newStudent.Id });
+                return RedirectToAction("index");
+                //var encryptedId = _Protector.Protect(newStudent.Id.ToString());
+                //return RedirectToAction("Details", new { id = encryptedId });
             }
             return View();
         }
@@ -127,11 +166,25 @@ namespace MockSchoolManagement.Controllers
         #region 编辑学生
         
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(string id)
         {
-            StudentEditViewModel model = 
-                new StudentEditViewModel(_studentRepository.GetStudent(id));
-            //throw new Exception("Edit出现异常！");
+            Student student = this.DecryptedStudent(id);
+            if (student == null)
+            {
+                ViewBag.ErrorMessage = $"编辑错误，请重试";
+                return View("NotFound");
+            }
+
+            StudentEditViewModel model = new StudentEditViewModel
+            {
+                Id = student.Id,
+                Name = student.Name,
+                Email = student.Email,
+                EnrollmentDate = student.EnrollmentDate,
+                Major = student.Major,
+                PhotoPath = student.PhotoPath
+            };
+            
             return View(model);
         }
 
@@ -141,37 +194,51 @@ namespace MockSchoolManagement.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (model.ExistingPhotoPath!=null)
+                //查询出模型
+                var student = _studentRepository.FirstOrDefalult(s => s.Id == model.Id);
+                if (student == null)
                 {
+                    ViewBag.ErrorMessage = $"编辑错误，请重试";
+                    return View("NotFound");
+                }
+
+                if (model.ExistingPhotoPath!=null)
+                {//判断是否有新上传的图片
                     string uniqueFileName = null;
-                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "image");
-                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ExistingPhotoPath.FileName;
-                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);
-                    model.ExistingPhotoPath.CopyTo(new FileStream(filePath, FileMode.Create));
+                    string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "image");//合并文件夹的路径
+                    uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ExistingPhotoPath.FileName;//生成的文件名
+                    string filePath = Path.Combine(uploadsFolder, uniqueFileName);//合成文件真实路径
+                    model.ExistingPhotoPath.CopyTo(new FileStream(filePath, FileMode.Create));//
                     model.PhotoPath = uniqueFileName;
                 }
-                Student student = new Student
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                    Email = model.Email,
-                    Major = model.Major,
-                    PhotoPath = model.PhotoPath,
-                };
+
+                student.Name = model.Name;
+                student.Email = model.Email;
+                student.Major = model.Major;
+                student.PhotoPath = model.PhotoPath;
+                student.EnrollmentDate = model.EnrollmentDate;
 
 
                 Student updateStudent = _studentRepository.Update(student);
-                return RedirectToAction("Details", new { id = updateStudent.Id });
+                return RedirectToAction("index");
+                //var encryptedId = _Protector.Protect(student.Id.ToString());
+                //return RedirectToAction("Details", new { id = encryptedId });
             }
-            return View();
+            return View(model);
         }
         #endregion
 
         #region 删除学生
         //[Authorize(Policy = "SuperAdminPolicy")]
-        public IActionResult Remove(int id)
+        public async Task<IActionResult> Remove(string id)
         {
-            _studentRepository.Delete(id);
+            var student = this.DecryptedStudent(id);
+            if (student == null)
+            {
+                ViewBag.ErrorMessage = $"删除Id={id}失败，请重试";
+                return View("NotFound");
+            }
+            await _studentRepository.DeleteAsync(student);
             return RedirectToAction("Index");
         }
         #endregion

@@ -1,46 +1,60 @@
-﻿@model IEnumerable<Student>;
+﻿@model List<Student>;
 @{
     ViewBag.Title = "学生详情页面";
 
 }
 
 
-
-<table class="table">
-    <thead>
-        <tr>
-            <th scope="col">Id</th>
-            <th scope="col">Phot</th>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Major</th>
-            <th scope="col">Modify</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var student in Model)
-        {
-            var photoPath = "~/image/" + (student.PhotoPath ?? "exw.gif");
-            <tr style="line-height: 80px">
-                <th scope="row">@student.Id</th>
-                <th>
-                    <img class="img-thumbnail" src="@photoPath"
-                         asp-append-version="true" style="height:80px"/>
-                </th>
-                <th>@student.Name</th>
-                <th>@student.Email</th>
-                <th>@student.Major.GetDisplayName()</th>
-                <th>
-                    <a asp-controller="home" asp-action="details" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">查看</a>
-                    <a asp-controller="home" asp-action="edit" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">编辑</a>
-                    <a asp-controller="home" asp-action="remove" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">删除</a>
-                </th>
+<div class="row">
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                @*<th scope="col">Id</th>*@
+                <th scope="col">Phot</th>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Major</th>
+                <th scope="col">EnrollmentDate</th>
+                <th scope="col">Modify</th>
             </tr>
-        }
+        </thead>
+        <tbody>
+            @foreach (var student in Model)
+            {
+                var photoPath = "~/image/" + (student.PhotoPath ?? "exw.gif");
+                <tr style="line-height: 80px">
+                    @*<th scope="row">@student.Id</th>*@
+                    <th>
+                        <img class="img-thumbnail" src="@photoPath"
+                             asp-append-version="true" style="height:80px" />
+                    </th>
+                    <th>@student.Name</th>
+                    <th>@student.Email</th>
+                    <th>@student.Major.GetDisplayName()</th>
+                    <th>@student.EnrollmentDate.ToString("yyyy-MM-dd")</th>
+                    <th>
+                        <form method="post" asp-action="remove" asp-route-id="@student.Id">
+                            <a asp-controller="home" asp-action="details" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">查看</a>
+                            <a asp-controller="home" asp-action="edit" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">编辑</a>
+                            <span id="confirmDeleteSpan_@student.EncryptedId" style="display:none">
+                                <span>你确定你要删除?</span>
+                                <button type="submit" class="btn btn-danger">是</button>
+                                <a href="#" class="btn btn-primary"
+                                   onclick="confirmDelete('@student.EncryptedId', false)">否</a>
+                            </span>
+
+                            <span id="deleteSpan_@student.Id">
+                                <a href="#" class="btn btn-danger"
+                                   onclick="confirmDelete('@student.EncryptedId', true)">删除</a>
+                            </span>
+                        </form>
+                    </th>
+                </tr>
+            }
         </tbody>
-</table>
+    </table>
+</div>
 
-
-@*@section Scripts{
-        <script src="~/js/site.js"></script>
-    }*@
+@section Scripts{
+    <script src="~/js/CustomScript.js"></script>
+}

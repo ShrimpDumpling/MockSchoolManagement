@@ -13,11 +13,12 @@ namespace MockSchoolManagement.ViewModels
     public class StudentEditViewModel
     {
         public IFormFile ExistingPhotoPath { get; set; }
+
         public int Id { get; set; }
 
         [Display(Name = "名字")]
         [Required(ErrorMessage = "请输入名字，它不能为空！"),
-            MinLength(5, ErrorMessage = "名字的长度不能小于5个字符"),
+            MinLength(2, ErrorMessage = "名字的长度不能小于5个字符"),
             MaxLength(50, ErrorMessage = "名字的长度不能超过50个字符")]
         public string Name { get; set; }
 
@@ -33,24 +34,17 @@ namespace MockSchoolManagement.ViewModels
         [Required(ErrorMessage = "请输入邮箱地址，它不能为空！")]
         public string Email { get; set; }
 
-
+        //实际的头像路径
         public string PhotoPath { get; set; }
 
 
-        [Display(Name = "头像")]
-        public IFormFile Photo { get; set; } //新图片
+        //[Display(Name = "头像")]
+        //public IFormFile Photo { get; set; } //新图片
+        public DateTime EnrollmentDate { get; set; }
 
         public StudentEditViewModel()
         {
 
-        }
-        public StudentEditViewModel(Student student)
-        {
-            this.Id = student.Id;
-            this.Name = student.Name;
-            this.Major = student.Major;
-            this.Email = student.Email;
-            this.PhotoPath = student.PhotoPath;
         }
     }
 }

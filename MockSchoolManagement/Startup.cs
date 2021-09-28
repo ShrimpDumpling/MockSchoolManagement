@@ -49,7 +49,6 @@ namespace MockSchoolManagement
             services.AddSingleton<DataProtectionPurposeStrings>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
 
-
             services.AddAuthentication()
                 .AddMicrosoftAccount(microsoleOptions =>
                 {

@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "学生详情";
-    var photoPath = "~/image/"+(Model.Student.PhotoPath ?? "exw.gif");
+    var photoPath = "~/image/" + (Model.Student.PhotoPath ?? "exw.gif");
 }
 
 <h3>@Model.PageTitle</h3>
@@ -16,18 +16,36 @@
             <div class="card-body text-center">
                 <img class="card-img-top" src="@photoPath"
                      asp-append-version="true" />
-                <h4>学生ID:@Model.Student.Id</h4>
+                @*<h4>学生ID:@Model.Student.Id</h4>*@
                 <h4>邮箱：@Model.Student.Email</h4>
                 <h4>主修科目：@Model.Student.Major</h4>
                 <h4>主修科目：@Model.Student.Major.GetDisplayName()</h4>
 
             </div>
             <div class="card-footer text-center">
-                <a asp-controller="home" asp-action="index" class="btn btn-primary m-1">返回</a>
-                <a asp-controller="home" asp-action="edit" asp-route-id="@Model.Student.Id" class="btn btn-primary m-1">编辑</a>
-                <a asp-controller="home" asp-action="remove" asp-route-id="@Model.Student.Id" class="btn btn-primary m-1">删除</a>
+
+                <form method="post" asp-action="remove" asp-route-id="@Model.Student.EncryptedId">
+                    <a asp-controller="home" asp-action="index" class="btn btn-primary m-1">返回</a>
+                    <a asp-controller="home" asp-action="edit" asp-route-id="@Model.Student.EncryptedId" class="btn btn-primary m-1">编辑</a>
+
+                    <span id="confirmDeleteSpan_@Model.Student.EncryptedId" style="display:none">
+                        <span>你确定你要删除?</span>
+                        <button type="submit" class="btn btn-danger">是</button>
+                        <a href="#" class="btn btn-primary"
+                           onclick="confirmDelete('@Model.Student.EncryptedId', false)">否</a>
+                    </span>
+
+                    <span id="deleteSpan_@Model.Student.EncryptedId">
+                        <a href="#" class="btn btn-danger"
+                           onclick="confirmDelete('@Model.Student.EncryptedId', true)">删除</a>
+                    </span>
+                </form>
             </div>
         </div>
     </div>
 </div>
 
+
+@section Scripts{
+    <script src="~/js/CustomScript.js"></script>
+}
