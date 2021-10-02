@@ -16,10 +16,9 @@ namespace MockSchoolManagement.Infrastructure
         /// <param name="modelBuilder"></param>
         public static void Seed(this ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Student>().HasData(
-                new Student() { Id = 1, Name = "张三", Major = MajorEnum.FirestGrade, Email = "anonyjie@outlook.com" },
-                new Student() { Id = 2, Name = "李四", Major = MajorEnum.FirestGrade, Email = "evilnanako@outlook.com" },
-                new Student() { Id = 3, Name = "赵六", Major = MajorEnum.GradeThree, Email = "hackerhzj@qq.com" });
+            modelBuilder.Entity<Course>().ToTable("Course", "School");
+            modelBuilder.Entity<Student>().ToTable("Student", "School");
+            modelBuilder.Entity<StudentCourse>().ToTable("StudentCourse", "School");
         }
     }
 }
