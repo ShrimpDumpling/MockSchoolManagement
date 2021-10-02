@@ -22,6 +22,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using MockSchoolManagement.Security.CustomTokenProvider;
 using Microsoft.AspNetCore.DataProtection;
+using MockSchoolManagement.Application.Students;
 
 namespace MockSchoolManagement
 {
@@ -48,6 +49,8 @@ namespace MockSchoolManagement
 
             services.AddSingleton<DataProtectionPurposeStrings>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
+            services.AddScoped<IStudentService, StudentService>();
+            
 
             services.AddAuthentication()
                 .AddMicrosoftAccount(microsoleOptions =>

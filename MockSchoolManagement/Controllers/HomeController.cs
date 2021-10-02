@@ -14,6 +14,8 @@ using Microsoft.AspNetCore.DataProtection;
 using MockSchoolManagement.Security.CustomTokenProvider;
 using MockSchoolManagement.Infrastructure;
 using Microsoft.EntityFrameworkCore;
+using MockSchoolManagement.Application.Students;
+using MockSchoolManagement.Application.Students.Dtos;
 
 namespace MockSchoolManagement.Controllers
 {
@@ -22,16 +24,19 @@ namespace MockSchoolManagement.Controllers
         private readonly IRepository<Student, int> _studentRepository;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IDataProtector _Protector;
+        private readonly IStudentService _studentService;
 
         public HomeController(IRepository<Student,int> studentRepository, 
             IWebHostEnvironment webHostEnvironment,
             IDataProtectionProvider dataProtector, 
-            DataProtectionPurposeStrings dataProtectionPurposeStrings)
+            DataProtectionPurposeStrings dataProtectionPurposeStrings,
+            IStudentService studentService)
         {
             _studentRepository = studentRepository;
             _webHostEnvironment = webHostEnvironment;
             _Protector = dataProtector.CreateProtector(
                 dataProtectionPurposeStrings.StudentIdRouteValue);
+            _studentService = studentService;
         }
 
 
@@ -71,36 +76,16 @@ namespace MockSchoolManagement.Controllers
         #endregion
 
         [AllowAnonymous]
-        public IActionResult Index(int? pageNumber,int pageSize=10,string sortBy="Id")
+        public async Task<IActionResult> Index(GetStudentInput input)
         {
-            IQueryable<Student> query = _studentRepository.GetAll().OrderBy(sortBy).AsNoTracking();
-            List<Student> model = query.ToList()
-                .Select(s=>
-                {//加密了学生ID作为路由放入viewmodel中
-                    s.EncryptedId = _Protector.Protect(s.Id.ToString());
-                    return s;
-                }).ToList();
-
-            return View(model);
-        }
-        public async Task<IActionResult> Index(string searchString,string sortBy = "Id")
-        {
-            ViewBag.CurrentFilter = searchString?.Trim();
-            IQueryable<Student> query = _studentRepository.GetAll();
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                query = query.Where(s => s.Name.Contains(searchString)
-                                       || s.Email.Contains(searchString));
-            }
-            query = query.OrderBy(sortBy).AsNoTracking();
-            List<Student> model = query.ToList()
+            var dtos = await _studentService.GetPaginatedResult(input);
+            dtos.Data=dtos.Data
                 .Select(s =>
                 {//加密了学生ID作为路由放入viewmodel中
                     s.EncryptedId = _Protector.Protect(s.Id.ToString());
                     return s;
                 }).ToList();
-
-            return View(model);
+            return View(dtos);
         }
 
         #region 学生详情页
