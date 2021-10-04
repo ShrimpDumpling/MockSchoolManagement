@@ -22,18 +22,15 @@ namespace MockSchoolManagement.Infrastructure
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);//使用基类里的初始化方法
-            modelBuilder.Seed();//自定义种子数据
+            modelBuilder.Seed();//自定义的方法
 
+            //获取当前系统中所有领域模型上的外键列表
             var foreigKeys = modelBuilder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys());
             foreach (var foreignKey in foreigKeys)
-            {//删除外键关联
+            {   //然后将它们的删除行为配置为 Restrict即无操作
                 foreignKey.DeleteBehavior = DeleteBehavior.Restrict;
             }
 
-            //自定义生成的数据库表名
-            modelBuilder.Entity<Course>().ToTable("Course", "School");
-            modelBuilder.Entity<StudentCourse>().ToTable("StudentCourse", "School");
-            modelBuilder.Entity<Student>().ToTable("Student", "School");
         }
 
     }

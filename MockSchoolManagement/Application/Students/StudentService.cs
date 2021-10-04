@@ -28,7 +28,7 @@ namespace MockSchoolManagement.Application.Students
         /// <summary>
         /// 获取分页数据
         /// </summary>
-        public async Task<PageResultDto<Student>> GetPaginatedResult(GetStudentInput input)
+        public async Task<PagedResultDto<Student>> GetPaginatedResult(GetStudentInput input)
         {
             var query = _studentRepository.GetAll();
             if (!string.IsNullOrEmpty(input.FilterText))
@@ -42,7 +42,7 @@ namespace MockSchoolManagement.Application.Students
 
             var models = await query.AsNoTracking().ToListAsync();
 
-            var dtos = new PageResultDto<Student>
+            var dtos = new PagedResultDto<Student>
             {
                 TotalCount = count,
                 CurrentPage = input.CurrentPage,

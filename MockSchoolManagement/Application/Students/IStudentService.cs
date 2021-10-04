@@ -11,6 +11,6 @@ namespace MockSchoolManagement.Application.Students
 {
     public interface IStudentService
     {
-        Task<PageResultDto<Student>> GetPaginatedResult(GetStudentInput input);
+        Task<PagedResultDto<Student>> GetPaginatedResult(GetStudentInput input);
     }
 }

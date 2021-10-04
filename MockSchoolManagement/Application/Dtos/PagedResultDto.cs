@@ -11,7 +11,7 @@ namespace MockSchoolManagement.Application.Dtos
     /// 泛型的分页数据返回值
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>
-    public class PageResultDto<TEntity>:PagedSortedAndFilterInput
+    public class PagedResultDto<TEntity>:PagedSortedAndFilterInput
     {
         /// <summary>
         /// 数据总合计

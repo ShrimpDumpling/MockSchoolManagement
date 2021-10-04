@@ -23,6 +23,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using MockSchoolManagement.Security.CustomTokenProvider;
 using Microsoft.AspNetCore.DataProtection;
 using MockSchoolManagement.Application.Students;
+using MockSchoolManagement.Infrastructure.Data;
+using MockSchoolManagement.Application.Courses;
 
 namespace MockSchoolManagement
 {
@@ -50,7 +52,8 @@ namespace MockSchoolManagement
             services.AddSingleton<DataProtectionPurposeStrings>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
             services.AddScoped<IStudentService, StudentService>();
-            
+            services.AddScoped<ICourseService,CourseService>();
+
 
             services.AddAuthentication()
                 .AddMicrosoftAccount(microsoleOptions =>
@@ -164,6 +167,7 @@ namespace MockSchoolManagement
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILogger<Startup> logger)
         {
+            app.UseDataInitializer();
 
             if (env.IsDevelopment())
             {
@@ -176,6 +180,11 @@ namespace MockSchoolManagement
                 app.UseStatusCodePagesWithReExecute("/Error/{0}");
                 app.UseExceptionHandler("/Error");
             }
+
+            //数据初始化
+            app.UseDataInitializer();
+
+
             //app.UseDirectoryBrowser();
             //app.UseDefaultFiles();
             //app.UseStaticFiles();
