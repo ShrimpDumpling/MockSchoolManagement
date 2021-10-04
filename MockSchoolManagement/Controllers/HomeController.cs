@@ -75,6 +75,20 @@ namespace MockSchoolManagement.Controllers
         }
         #endregion
 
+        public async Task<ActionResult> About()
+        {
+            var data = from student in _studentRepository.GetAll()
+                       group student by student.EnrollmentDate into dateGroup
+                       select new EnrollmentDateGrpoupDto()
+                       {
+                           EnrollmentDate = dateGroup.Key,
+                           StudentCount = dateGroup.Count()
+                       };
+            var dtos = await data.AsNoTracking().ToListAsync();
+            return View(dtos);
+        }
+
+
         [AllowAnonymous]
         public async Task<IActionResult> Index(GetStudentInput input)
         {
