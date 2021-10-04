@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.DataProtection;
 using MockSchoolManagement.Application.Students;
 using MockSchoolManagement.Infrastructure.Data;
 using MockSchoolManagement.Application.Courses;
+using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 
 namespace MockSchoolManagement
 {
@@ -107,7 +108,10 @@ namespace MockSchoolManagement
                                               .Build();
                 a.Filters.Add(new AuthorizeFilter(policy));
             })
+                .AddRazorRuntimeCompilation()//部署或者测试的时候请注释掉
                 .AddXmlSerializerFormatters();
+            
+
 
             //services.AddLogging();
             //services.AddControllersWithViews();
@@ -168,6 +172,8 @@ namespace MockSchoolManagement
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILogger<Startup> logger)
         {
             //app.UseDataInitializer(); //初始化种子数据的方法，调试的时候使用
+
+
 
             if (env.IsDevelopment())
             {
