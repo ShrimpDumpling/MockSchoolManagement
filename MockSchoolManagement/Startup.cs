@@ -171,7 +171,7 @@ namespace MockSchoolManagement
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILogger<Startup> logger)
         {
-            //app.UseDataInitializer(); //初始化种子数据的方法，调试的时候使用
+            app.UseDataInitializer(); //初始化种子数据的方法，调试的时候使用
 
 
 

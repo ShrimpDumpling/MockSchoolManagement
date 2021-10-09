@@ -10,8 +10,8 @@ using MockSchoolManagement.Infrastructure;
 namespace MockSchoolManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20210908041552_updateForeignKey")]
-    partial class updateForeignKey
+    [Migration("20211009162326_AddAllSchoolEntities")]
+    partial class AddAllSchoolEntities
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -220,6 +220,90 @@ namespace MockSchoolManagement.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
+            modelBuilder.Entity("MockSchoolManagement.Models.Course", b =>
+                {
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Credits")
+                        .HasColumnType("int");
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("CourseID");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Course", "School");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.CourseAssignment", b =>
+                {
+                    b.Property<int>("CourseAssignmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CourseId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("CourseAssignmentId");
+
+                    b.HasIndex("CourseId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("CourseAssignment", "School");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Department", b =>
+                {
+                    b.Property<int>("DepartmentId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<decimal>("Budget")
+                        .HasColumnType("money");
+
+                    b.Property<string>("Name")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.HasKey("DepartmentId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("Department", "School");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.OfficeLocation", b =>
+                {
+                    b.Property<int>("TeacherId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Location")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.HasKey("TeacherId");
+
+                    b.ToTable("OfficeLocation", "School");
+                });
+
             modelBuilder.Entity("MockSchoolManagement.Models.Student", b =>
                 {
                     b.Property<int>("Id")
@@ -230,6 +314,9 @@ namespace MockSchoolManagement.Migrations
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("EnrollmentDate")
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("Major")
                         .HasColumnType("int");
@@ -244,30 +331,53 @@ namespace MockSchoolManagement.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Students");
+                    b.ToTable("Student", "School");
+                });
 
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            Email = "anonyjie@outlook.com",
-                            Major = 1,
-                            Name = "张三"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            Email = "evilnanako@outlook.com",
-                            Major = 1,
-                            Name = "李四"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            Email = "hackerhzj@qq.com",
-                            Major = 3,
-                            Name = "赵六"
-                        });
+            modelBuilder.Entity("MockSchoolManagement.Models.StudentCourse", b =>
+                {
+                    b.Property<int>("StudentsCourseId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CourseID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Grade")
+                        .HasColumnType("int");
+
+                    b.Property<int>("StudentID")
+                        .HasColumnType("int");
+
+                    b.HasKey("StudentsCourseId");
+
+                    b.HasIndex("CourseID");
+
+                    b.HasIndex("StudentID");
+
+                    b.ToTable("StudentCourse", "School");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Teacher", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<DateTime>("HireDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasColumnName("TeacherName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Teacher", "School");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -319,6 +429,100 @@ namespace MockSchoolManagement.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Course", b =>
+                {
+                    b.HasOne("MockSchoolManagement.Models.Department", "Department")
+                        .WithMany("Courses")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Department");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.CourseAssignment", b =>
+                {
+                    b.HasOne("MockSchoolManagement.Models.Course", "Course")
+                        .WithMany("CourseAssignments")
+                        .HasForeignKey("CourseId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MockSchoolManagement.Models.Teacher", "Teacher")
+                        .WithMany("CourseAssignments")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Teacher");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Department", b =>
+                {
+                    b.HasOne("MockSchoolManagement.Models.Teacher", "Administrator")
+                        .WithMany()
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.Navigation("Administrator");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.OfficeLocation", b =>
+                {
+                    b.HasOne("MockSchoolManagement.Models.Teacher", "teacher")
+                        .WithOne("OfficeLocations")
+                        .HasForeignKey("MockSchoolManagement.Models.OfficeLocation", "TeacherId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("teacher");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.StudentCourse", b =>
+                {
+                    b.HasOne("MockSchoolManagement.Models.Course", "Course")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("CourseID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MockSchoolManagement.Models.Student", "Student")
+                        .WithMany("StudentCourses")
+                        .HasForeignKey("StudentID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Course");
+
+                    b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Course", b =>
+                {
+                    b.Navigation("CourseAssignments");
+
+                    b.Navigation("StudentCourses");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Department", b =>
+                {
+                    b.Navigation("Courses");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Student", b =>
+                {
+                    b.Navigation("StudentCourses");
+                });
+
+            modelBuilder.Entity("MockSchoolManagement.Models.Teacher", b =>
+                {
+                    b.Navigation("CourseAssignments");
+
+                    b.Navigation("OfficeLocations");
                 });
 #pragma warning restore 612, 618
         }

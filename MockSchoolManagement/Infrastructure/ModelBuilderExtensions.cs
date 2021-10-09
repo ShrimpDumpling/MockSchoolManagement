@@ -19,6 +19,11 @@ namespace MockSchoolManagement.Infrastructure
             modelBuilder.Entity<Course>().ToTable("Course", "School");
             modelBuilder.Entity<Student>().ToTable("Student", "School");
             modelBuilder.Entity<StudentCourse>().ToTable("StudentCourse", "School");
+
+            modelBuilder.Entity<Department>().ToTable("Department", "School");
+            modelBuilder.Entity<Teacher>().ToTable("Teacher", "School");
+            modelBuilder.Entity<OfficeLocation>().ToTable("OfficeLocation", "School");
+            modelBuilder.Entity<CourseAssignment>().ToTable("CourseAssignment", "School");
         }
     }
 }

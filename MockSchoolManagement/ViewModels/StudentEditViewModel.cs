@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using MockSchoolManagement.Migrations;
+//using MockSchoolManagement.Migrations;
 using MockSchoolManagement.Models;
 using MockSchoolManagement.Models.EnumTypes;
 

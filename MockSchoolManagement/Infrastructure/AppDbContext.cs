@@ -19,6 +19,12 @@ namespace MockSchoolManagement.Infrastructure
         public DbSet<Student> Students { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
+
+        public DbSet<Department> Departments { get; set; }
+        public DbSet<Teacher> Teachers { get; set; }
+        public DbSet<OfficeLocation> OfficeLocations { get; set; }
+        public DbSet<CourseAssignment> CourseAssignments { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);//使用基类里的初始化方法
