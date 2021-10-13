@@ -27,7 +27,8 @@ namespace MockSchoolManagement.Application.Courses
 
             query = query.OrderBy(input.Sorting)
                 .Skip(input.MaxResultCount  * (input.CurrentPage -1)).Take(input.MaxResultCount);
-            var models = await query.AsNoTracking().ToListAsync();
+
+            var models = await query.Include(a=>a.Department).AsNoTracking().ToListAsync();// 预载
 
             var result = new PagedResultDto<Course>
             {

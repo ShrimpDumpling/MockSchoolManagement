@@ -37,35 +37,39 @@
                     <a asp-action="index" asp-route-sorting="Credits"
                        asp-route-CurrentPage="@Model.CurrentPage" asp-route-FilterText="@Model.FilterText">课程学分</a>
                 </th>
-
+                <th scope="col">
+                    <a asp-action="index" asp-route-sorting="Department"
+                       asp-route-CurrentPage="@Model.CurrentPage" asp-route-FilterText="@Model.FilterText">部门</a>
+                </th>
                 <th scope="col">操作</th>
             </tr>
         </thead>
         <tbody>
             @foreach (var course in Model.Data)
             {
-                <tr>
-                    <th>@course.CourseID</th>
-                    <th>@course.Title</th>
-                    <th>@course.Credits</th>
-                    <th>
-                        <form method="post" asp-action="remove" asp-route-id="@course.CourseID">
-                            <a asp-controller="Course" asp-action="details" asp-route-id="@course.CourseID" class="btn btn-primary m-1">查看</a>
-                            <a asp-controller="Course" asp-action="edit" asp-route-id="@course.CourseID" class="btn btn-primary m-1">编辑</a>
-                            <span id="confirmDeleteSpan_@course.CourseID" style="display:none">
-                                <span>你确定你要删除?</span>
-                                <button type="submit" class="btn btn-danger">是</button>
-                                <a href="#" class="btn btn-primary"
-                                   onclick="confirmDelete('@course.CourseID', false)">否</a>
-                            </span>
+            <tr>
+                <th>@course.CourseID</th>
+                <th>@course.Title</th>
+                <th>@course.Credits</th>
+                <th>@course.Department.Name</th>
+                <th>
+                    <form method="post" asp-action="remove" asp-route-id="@course.CourseID">
+                        <a asp-controller="Course" asp-action="details" asp-route-id="@course.CourseID" class="btn btn-primary m-1">查看</a>
+                        <a asp-controller="Course" asp-action="edit" asp-route-id="@course.CourseID" class="btn btn-primary m-1">编辑</a>
+                        <span id="confirmDeleteSpan_@course.CourseID" style="display:none">
+                            <span>你确定你要删除?</span>
+                            <button type="submit" class="btn btn-danger">是</button>
+                            <a href="#" class="btn btn-primary"
+                               onclick="confirmDelete('@course.CourseID', false)">否</a>
+                        </span>
 
-                            <span id="deleteSpan_@course.CourseID">
-                                <a href="#" class="btn btn-danger"
-                                   onclick="confirmDelete('@course.CourseID', true)">删除</a>
-                            </span>
-                        </form>
-                    </th>
-                </tr>
+                        <span id="deleteSpan_@course.CourseID">
+                            <a href="#" class="btn btn-danger"
+                               onclick="confirmDelete('@course.CourseID', true)">删除</a>
+                        </span>
+                    </form>
+                </th>
+            </tr>
             }
         </tbody>
     </table>

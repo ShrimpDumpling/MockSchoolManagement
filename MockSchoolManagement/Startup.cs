@@ -25,7 +25,9 @@ using Microsoft.AspNetCore.DataProtection;
 using MockSchoolManagement.Application.Students;
 using MockSchoolManagement.Infrastructure.Data;
 using MockSchoolManagement.Application.Courses;
+using MockSchoolManagement.Application.Teachers;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
+using NetCore.AutoRegisterDi;
 
 namespace MockSchoolManagement
 {
@@ -52,8 +54,13 @@ namespace MockSchoolManagement
 
             services.AddSingleton<DataProtectionPurposeStrings>();
             services.AddTransient(typeof(IRepository<,>), typeof(Repository<,>));
-            services.AddScoped<IStudentService, StudentService>();
-            services.AddScoped<ICourseService,CourseService>();
+
+
+            //services.AddScoped<IStudentService, StudentService>();
+            //services.AddScoped<ICourseService,CourseService>();
+            services.RegisterAssemblyPublicNonGenericClasses()
+                .Where(c => c.Name.EndsWith("Service"))
+                .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
 
 
             services.AddAuthentication()

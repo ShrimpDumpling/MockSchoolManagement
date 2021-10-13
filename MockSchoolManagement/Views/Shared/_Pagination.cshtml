@@ -10,12 +10,12 @@
             </li>
 
             <li class="page-item @(!Model.ShowPrevious?"disabled":"")">
-                <a class="page-link" asp-route-Current="(@Model.CurrentPage-1)"
+                <a class="page-link" asp-route-CurrentPage="@(Model.CurrentPage-1)"
                    asp-route-FilterText="@Model.FilterText" asp-route-Sorting="@Model.Sorting">Previous</a>
             </li>
 
             <li class="page-item @(!Model.ShowNext?"disabled":"")">
-                <a class="page-link" asp-route-Current="(@Model.CurrentPage+1)"
+                <a class="page-link" asp-route-CurrentPage="@(Model.CurrentPage+1)"
                    asp-route-FilterText="@Model.FilterText" asp-route-Sorting="@Model.Sorting">Next</a>
             </li>
 
