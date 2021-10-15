@@ -20,7 +20,7 @@ namespace MockSchoolManagement.Application.Teachers
         {
             _teacherResitory = teacherRepository;
         }
-        public async Task<PagedResultDto<Teacher>> GEtPagedTeacherList(GetTeacherInput input)
+        public async Task<PagedResultDto<Teacher>> GetPagedTeacherList(GetTeacherInput input)
         {
             var query = _teacherResitory.GetAll();
 

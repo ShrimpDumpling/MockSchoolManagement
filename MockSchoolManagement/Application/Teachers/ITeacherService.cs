@@ -12,6 +12,6 @@ namespace MockSchoolManagement.Application.Teachers
 {
     public interface ITeacherService
     {
-        Task<PagedResultDto<Teacher>> GEtPagedTeacherList(GetTeacherInput input);
+        Task<PagedResultDto<Teacher>> GetPagedTeacherList(GetTeacherInput input);
     }
 }
