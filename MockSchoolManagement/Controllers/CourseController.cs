@@ -146,7 +146,7 @@ namespace MockSchoolManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> Remove(int id)
         {
-            var model = await _courseRepository.FirstOrDefalultAsync(a => a.CourseID == id);
+            var model = await _courseRepository.FirstOrDefaultAsync(a => a.CourseID == id);
             if (model==null)
             {
                 ViewBag.ErrorMessage = $"课程编号{id}的信息不存在，请重试。";

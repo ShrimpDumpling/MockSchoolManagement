@@ -26,7 +26,7 @@ namespace MockSchoolManagement.Infrastructure
         Task<TEntity> SingleAsync(Expression<Func<TEntity, bool>> predicate);
 
         TEntity FirstOrDefalult(Expression<Func<TEntity, bool>> predicate);
-        Task<TEntity> FirstOrDefalultAsync(Expression<Func<TEntity, bool>> predicate);
+        Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate);
         #endregion
 
         #region Insert

@@ -194,8 +194,6 @@ namespace MockSchoolManagement
                 app.UseExceptionHandler("/Error");
             }
 
-            //数据初始化
-            app.UseDataInitializer();
 
 
             //app.UseDirectoryBrowser();

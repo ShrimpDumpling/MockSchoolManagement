@@ -65,7 +65,7 @@ namespace MockSchoolManagement.Controllers
                 //先解密加密过的路由id
                 string decryptedId = _Protector.Unprotect(id);
                 int decyuptedStudentId = Convert.ToInt32(decryptedId);
-                student = await _studentRepository.FirstOrDefalultAsync(s => s.Id == decyuptedStudentId);
+                student = await _studentRepository.FirstOrDefaultAsync(s => s.Id == decyuptedStudentId);
             }
             catch
             {

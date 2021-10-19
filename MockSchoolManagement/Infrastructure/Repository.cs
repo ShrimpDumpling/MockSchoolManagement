@@ -61,7 +61,7 @@ namespace MockSchoolManagement.Infrastructure
         {
             return GetAll().FirstOrDefault(predicate);
         }
-        public async Task<TEntity> FirstOrDefalultAsync(Expression<Func<TEntity, bool>> predicate)
+        public async Task<TEntity> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
         {
             return await GetAll().FirstOrDefaultAsync(predicate);
         }

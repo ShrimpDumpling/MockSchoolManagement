@@ -181,7 +181,7 @@ namespace MockSchoolManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _teacherRepository.FirstOrDefalultAsync(a => a.Id == id);
+            var model = await _teacherRepository.FirstOrDefaultAsync(a => a.Id == id);
             if (model==null)
             {
                 ViewBag.ErrorMessage = $"教师id为{id}的信息不存在，请重试";
