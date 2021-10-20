@@ -23,19 +23,19 @@ namespace MockSchoolManagement.Controllers
         public async Task<string> Index()
         {
             var studnet = await _studnetRepository.GetAll().FirstOrDefaultAsync();
-            var oop = await _studnetRepository.SingleAsync(a => a.Id == 1006);
+            var oop = await _studnetRepository.SingleAsync(a => a.ID == 1006);
             var longcount = await _studnetRepository.LongCountAsync();
             var count = await _studnetRepository.CountAsync();
             return $"Name:{oop.Name}+{studnet.Name}+{longcount}+{count}";
         }
         public async Task<string> GetUserInfo(int id)
         {
-            var oop = await _studnetRepository.SingleAsync(a => a.Id == id);
+            var oop = await _studnetRepository.SingleAsync(a => a.ID == id);
             if (oop==null)
             {
                 return "you id is null";
             }
-            return $"Id={oop.Id},Name={oop.Name},Email={oop.Email},major={oop.Major}";
+            return $"Id={oop.ID},Name={oop.Name},Email={oop.Email},major={oop.Major}";
         }
     }
 }

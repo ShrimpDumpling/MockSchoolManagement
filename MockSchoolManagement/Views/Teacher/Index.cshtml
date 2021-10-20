@@ -53,13 +53,13 @@
                 @foreach (var item in Model.Teachers.Data)
                 {
                     string selectedRow = "";
-                    if (item.Id == Model.SelectedId)
+                    if (item.ID == Model.SelectedId)
                     {
                         selectedRow = "table-success";
                     }
                     <tr class="@selectedRow">
 
-                        <td>@item.Id</td>
+                        <td>@item.ID</td>
                         <td>@item.Name</td>
                         <td>   @Html.DisplayFor(modelItem => item.HireDate)      </td>
 
@@ -82,18 +82,18 @@
                             }
                         </td>
                         <td>
-                            <form method="post" asp-action="Delete" asp-route-id="@item.Id">
-                                <a asp-controller="Teacher" class="btn btn-info" asp-action="Index" asp-route-Sorting="@Model.Teachers.Sorting" asp-route-CurrentPage="@Model.Teachers.CurrentPage" asp-route-id="@item.Id">查看</a>
-                                <a asp-controller="Teacher" asp-action="edit" asp-route-id="@item.Id" class="btn btn-primary m-1">编辑</a>
-                                <span id="confirmDeleteSpan_@item.Id" style="display: none">
+                            <form method="post" asp-action="Delete" asp-route-id="@item.ID">
+                                <a asp-controller="Teacher" class="btn btn-info" asp-action="Index" asp-route-Sorting="@Model.Teachers.Sorting" asp-route-CurrentPage="@Model.Teachers.CurrentPage" asp-route-id="@item.ID">查看</a>
+                                <a asp-controller="Teacher" asp-action="edit" asp-route-id="@item.ID" class="btn btn-primary m-1">编辑</a>
+                                <span id="confirmDeleteSpan_@item.ID" style="display: none">
                                     <span>你确定你要删除?</span>
                                     <button type="submit" class="btn btn-danger">是</button>
-                                    <a href="#" class="btn btn-primary" onclick="confirmDelete('@item.Id', false)">
+                                    <a href="#" class="btn btn-primary" onclick="confirmDelete('@item.ID', false)">
                                         否
                                     </a>
                                 </span>
-                                <span id="deleteSpan_@item.Id">
-                                    <a href="#" class="btn btn-danger" onclick="confirmDelete('@item.Id', true)">删除</a>
+                                <span id="deleteSpan_@item.ID">
+                                    <a href="#" class="btn btn-danger" onclick="confirmDelete('@item.ID', true)">删除</a>
                                 </span>
                             </form>
                     </tr>

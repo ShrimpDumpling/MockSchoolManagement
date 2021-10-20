@@ -63,13 +63,13 @@ namespace MockSchoolManagement.Infrastructure.Data
                 var departments = new[]
                 {
                     new Department { Name = "论语", Budget = 350000, StartDate = DateTime.Parse ("2017-09-01"), 
-                        TeacherId = teachers.Single (i => i.Name == "孟子").Id },
+                        TeacherId = teachers.Single (i => i.Name == "孟子").ID },
                     new Department { Name = "兵法", Budget = 100000, StartDate = DateTime.Parse ("2017-09-01"), 
-                        TeacherId = teachers.Single (i => i.Name == "鬼谷子").Id },
+                        TeacherId = teachers.Single (i => i.Name == "鬼谷子").ID },
                     new Department { Name = "文言文", Budget = 350000, StartDate = DateTime.Parse ("2017-09-01"), 
-                        TeacherId = teachers.Single (i => i.Name == "朱熹").Id },
+                        TeacherId = teachers.Single (i => i.Name == "朱熹").ID },
                     new Department { Name = "墨学", Budget = 100000, StartDate = DateTime.Parse ("2017-09-01"), 
-                        TeacherId = teachers.Single (i => i.Name == "墨子").Id }
+                        TeacherId = teachers.Single (i => i.Name == "墨子").ID }
                 };
 
                 foreach (Department item in departments)
@@ -106,9 +106,9 @@ namespace MockSchoolManagement.Infrastructure.Data
                 #region 办公室分配的种子数据
 
                 var OfficeLocations = new[] {
-                    new OfficeLocation { TeacherId = teachers.Single (i => i.Name == "孟子").Id, Location = "逸夫楼 17" },
-                    new OfficeLocation { TeacherId = teachers.Single (i => i.Name == "朱熹").Id, Location = "青霞路 27" },
-                    new OfficeLocation { TeacherId = teachers.Single (i => i.Name == "墨子").Id, Location = "天府楼 304" }
+                    new OfficeLocation { TeacherId = teachers.Single (i => i.Name == "孟子").ID, Location = "逸夫楼 17" },
+                    new OfficeLocation { TeacherId = teachers.Single (i => i.Name == "朱熹").ID, Location = "青霞路 27" },
+                    new OfficeLocation { TeacherId = teachers.Single (i => i.Name == "墨子").ID, Location = "天府楼 304" }
                 };
 
                 foreach (var o in OfficeLocations)
@@ -120,14 +120,14 @@ namespace MockSchoolManagement.Infrastructure.Data
                 #region 为老师分配课程的种子数据
 
                 var coursetTeachers = new[] {
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "数学").CourseID, TeacherId = teachers.Single (i => i.Name == "鬼谷子").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "数学").CourseID, TeacherId = teachers.Single (i => i.Name == "墨子").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "政治").CourseID, TeacherId = teachers.Single (i => i.Name == "朱熹").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "化学").CourseID, TeacherId = teachers.Single (i => i.Name == "墨子").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "生物").CourseID, TeacherId = teachers.Single (i => i.Name == "孟子").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "英语").CourseID, TeacherId = teachers.Single (i => i.Name == "孟子").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "物理").CourseID, TeacherId = teachers.Single (i => i.Name == "鬼谷子").Id },
-                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "历史").CourseID, TeacherId = teachers.Single (i => i.Name == "朱熹").Id }
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "数学").CourseID, TeacherId = teachers.Single (i => i.Name == "鬼谷子").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "数学").CourseID, TeacherId = teachers.Single (i => i.Name == "墨子").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "政治").CourseID, TeacherId = teachers.Single (i => i.Name == "朱熹").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "化学").CourseID, TeacherId = teachers.Single (i => i.Name == "墨子").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "生物").CourseID, TeacherId = teachers.Single (i => i.Name == "孟子").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "英语").CourseID, TeacherId = teachers.Single (i => i.Name == "孟子").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "物理").CourseID, TeacherId = teachers.Single (i => i.Name == "鬼谷子").ID },
+                    new CourseAssignment { CourseId = courses.Single (c => c.Title == "历史").CourseID, TeacherId = teachers.Single (i => i.Name == "朱熹").ID }
                                                                                                                
                 };
 
@@ -139,7 +139,7 @@ namespace MockSchoolManagement.Infrastructure.Data
 
                 #region 学生课程关联种子数据
                 var studentCourses = new[] {
-                    new StudentCourse { StudentID = students.Single (s => s.Name == "张三").Id, CourseID = courses.Single (c => c.Title == "数学").CourseID, Grade = Grade.A },
+                    new StudentCourse { StudentID = students.Single (s => s.Name == "张三").ID, CourseID = courses.Single (c => c.Title == "数学").CourseID, Grade = Grade.A },
 
                 };
                 foreach (var sc in studentCourses)

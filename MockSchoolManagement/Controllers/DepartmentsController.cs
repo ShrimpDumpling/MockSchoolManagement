@@ -94,9 +94,9 @@ namespace MockSchoolManagement.Controllers
                 catch (DbUpdateConcurrencyException ex)
                 {   //异常触发后，获取异常的实体
                     var exceptionEntry = ex.Entries.Single();
-                    var clientValues = (Department)exceptionEntry.Entity;
+                    var clientValues = (Department)exceptionEntry.Entity;//当前值
                     //从数据库中获取该异常实体信息
-                    var databaseEntry = exceptionEntry.GetDatabaseValues();
+                    var databaseEntry = exceptionEntry.GetDatabaseValues();//数据库中的值
                     if (databaseEntry == null)
                     {//如果异常实体为null，则表示该行已经被删除
                         ModelState.AddModelError(string.Empty, "无法进行数据的修改。该部门信息已经被其他人所删除！");
@@ -113,7 +113,7 @@ namespace MockSchoolManagement.Controllers
                         if (databaseValues.TeacherId != clientValues.TeacherId)
                         {
                             var teacherEntity =
-                                 await _teacherRepository.FirstOrDefaultAsync(a => a.Id == databaseValues.TeacherId);
+                                 await _teacherRepository.FirstOrDefaultAsync(a => a.ID == databaseValues.TeacherId);
                             ModelState.AddModelError("TeacherId", $"当前值:{teacherEntity?.Name}");
                         }
                         ModelState.AddModelError("", "你正在编辑的记录已经被其他用户所修改，编辑操作已经被取消，数据库当前的值已经显示在页面上。请再次点击保存。否则请返回列表。");

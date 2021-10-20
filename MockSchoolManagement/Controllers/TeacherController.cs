@@ -45,7 +45,7 @@ namespace MockSchoolManagement.Controllers
 
             if (input.Id!=null)
             {
-                var teacher = models.Data.FirstOrDefault(a => a.Id == input.Id.Value);
+                var teacher = models.Data.FirstOrDefault(a => a.ID == input.Id.Value);
                 if (teacher!=null)
                 {
                     dto.Courses = teacher.CourseAssignments.Select(a => a.Course).ToList();
@@ -106,7 +106,7 @@ namespace MockSchoolManagement.Controllers
                     teacher.CourseAssignments.Add(new CourseAssignment
                     {
                         CourseId = course.CourseId,
-                        TeacherId = teacher.Id
+                        TeacherId = teacher.ID
                     });
                 }
                 await _teacherRepository.InsertAsync(teacher);
@@ -122,7 +122,7 @@ namespace MockSchoolManagement.Controllers
         {
             var model = await _teacherRepository.GetAll().Include(a => a.OfficeLocations)
                 .Include(a => a.CourseAssignments).ThenInclude(a => a.Course)
-                .AsNoTracking().FirstOrDefaultAsync(a => a.Id == id);
+                .AsNoTracking().FirstOrDefaultAsync(a => a.ID == id);
             if (model==null)
             {
                 ViewBag.ErrorMessage = $"教师信息ID为{id}的信息不存在，请重试。";
@@ -130,7 +130,7 @@ namespace MockSchoolManagement.Controllers
             }
             var dto = new TeacherCreateViewModel
             {
-                Id = model.Id,
+                Id = model.ID,
                 Name = model.Name,
                 HireDate = model.HireDate,
                 OfficeLocation = model.OfficeLocations
@@ -148,7 +148,7 @@ namespace MockSchoolManagement.Controllers
                 var teacher = await _teacherRepository.GetAll().Include(i => i.OfficeLocations)
                     .Include(i => i.CourseAssignments)
                         .ThenInclude(i => i.Course)
-                    .FirstOrDefaultAsync(m => m.Id == input.Id);
+                    .FirstOrDefaultAsync(m => m.ID == input.Id);
                 if (teacher==null)
                 {
                     ViewBag.ErrorMessage = $"教师信息ID为{input.Id}的信息不存在，请重试。";
@@ -166,7 +166,7 @@ namespace MockSchoolManagement.Controllers
                     teacher.CourseAssignments.Add(new CourseAssignment
                     {
                         CourseId = item.CourseId,
-                        TeacherId = teacher.Id
+                        TeacherId = teacher.ID
                     });
                 }
 
@@ -181,15 +181,15 @@ namespace MockSchoolManagement.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            var model = await _teacherRepository.FirstOrDefaultAsync(a => a.Id == id);
+            var model = await _teacherRepository.FirstOrDefaultAsync(a => a.ID == id);
             if (model==null)
             {
                 ViewBag.ErrorMessage = $"教师id为{id}的信息不存在，请重试";
                 return View("NotFound");
             }
-            await _officeLocationRepository.DeleteAsync(a => a.TeacherId == model.Id);
-            await _courseAssignmentRepository.DeleteAsync(a => a.TeacherId == model.Id);
-            await _teacherRepository.DeleteAsync(a => a.Id == model.Id);
+            await _officeLocationRepository.DeleteAsync(a => a.TeacherId == model.ID);
+            await _courseAssignmentRepository.DeleteAsync(a => a.TeacherId == model.ID);
+            await _teacherRepository.DeleteAsync(a => a.ID == model.ID);
             return RedirectToActionPermanent(nameof(Index));
         }
         #endregion

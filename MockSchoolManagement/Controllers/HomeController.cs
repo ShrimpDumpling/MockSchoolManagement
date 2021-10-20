@@ -49,7 +49,7 @@ namespace MockSchoolManagement.Controllers
                 //先解密加密过的路由id
                 string decryptedId = _Protector.Unprotect(id);
                 int decyuptedStudentId = Convert.ToInt32(decryptedId);
-                student = _studentRepository.FirstOrDefalult(s => s.Id == decyuptedStudentId);
+                student = _studentRepository.FirstOrDefalult(s => s.ID == decyuptedStudentId);
             }
             catch
             {
@@ -65,7 +65,7 @@ namespace MockSchoolManagement.Controllers
                 //先解密加密过的路由id
                 string decryptedId = _Protector.Unprotect(id);
                 int decyuptedStudentId = Convert.ToInt32(decryptedId);
-                student = await _studentRepository.FirstOrDefaultAsync(s => s.Id == decyuptedStudentId);
+                student = await _studentRepository.FirstOrDefaultAsync(s => s.ID == decyuptedStudentId);
             }
             catch
             {
@@ -96,7 +96,7 @@ namespace MockSchoolManagement.Controllers
             dtos.Data=dtos.Data
                 .Select(s =>
                 {//加密了学生ID作为路由放入viewmodel中
-                    s.EncryptedId = _Protector.Protect(s.Id.ToString());
+                    s.EncryptedId = _Protector.Protect(s.ID.ToString());
                     return s;
                 }).ToList();
             return View(dtos);
@@ -166,7 +166,7 @@ namespace MockSchoolManagement.Controllers
                     //model.PhotoPath = uniqueFileName;
                 }
                 Student student = new Student {
-                    Id=model.Id,
+                    ID=model.Id,
                     Name=model.Name,
                     Email=model.Email,
                     PhotoPath=uniqueFileName,
@@ -198,7 +198,7 @@ namespace MockSchoolManagement.Controllers
 
             StudentEditViewModel model = new StudentEditViewModel
             {
-                Id = student.Id,
+                Id = student.ID,
                 Name = student.Name,
                 Email = student.Email,
                 EnrollmentDate = student.EnrollmentDate,
@@ -216,7 +216,7 @@ namespace MockSchoolManagement.Controllers
             if (ModelState.IsValid)
             {
                 //查询出模型
-                var student = _studentRepository.FirstOrDefalult(s => s.Id == model.Id);
+                var student = _studentRepository.FirstOrDefalult(s => s.ID == model.Id);
                 if (student == null)
                 {
                     ViewBag.ErrorMessage = $"编辑错误，请重试";

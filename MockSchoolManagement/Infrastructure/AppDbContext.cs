@@ -16,6 +16,8 @@ namespace MockSchoolManagement.Infrastructure
         {
 
         }
+
+        
         public DbSet<Student> Students { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<StudentCourse> StudentCourses { get; set; }
@@ -24,6 +26,8 @@ namespace MockSchoolManagement.Infrastructure
         public DbSet<Teacher> Teachers { get; set; }
         public DbSet<OfficeLocation> OfficeLocations { get; set; }
         public DbSet<CourseAssignment> CourseAssignments { get; set; }
+        public DbSet<Person> People { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

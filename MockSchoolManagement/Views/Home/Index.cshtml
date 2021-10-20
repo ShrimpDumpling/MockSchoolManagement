@@ -71,7 +71,7 @@
                     <th>@student.Major.GetDisplayName()</th>
                     <th>@student.EnrollmentDate.ToString("yyyy-MM-dd")</th>
                     <th>
-                        <form method="post" asp-action="remove" asp-route-id="@student.Id">
+                        <form method="post" asp-action="remove" asp-route-id="@student.ID">
                             <a asp-controller="home" asp-action="details" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">查看</a>
                             <a asp-controller="home" asp-action="edit" asp-route-id="@student.EncryptedId" class="btn btn-primary m-1">编辑</a>
                             <span id="confirmDeleteSpan_@student.EncryptedId" style="display:none">
@@ -81,7 +81,7 @@
                                    onclick="confirmDelete('@student.EncryptedId', false)">否</a>
                             </span>
 
-                            <span id="deleteSpan_@student.Id">
+                            <span id="deleteSpan_@student.ID">
                                 <a href="#" class="btn btn-danger"
                                    onclick="confirmDelete('@student.EncryptedId', true)">删除</a>
                             </span>

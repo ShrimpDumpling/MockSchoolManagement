@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace MockSchoolManagement.Migrations
 {
-    public partial class AddAllSchoolEntities : Migration
+    public partial class AddPersonEntity : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -51,36 +51,18 @@ namespace MockSchoolManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Student",
+                name: "Person",
                 schema: "School",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
+                    ID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Major = table.Column<int>(type: "int", nullable: false),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    EnrollmentDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Student", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Teacher",
-                schema: "School",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    TeacherName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Teacher", x => x.Id);
+                    table.PrimaryKey("PK_Person", x => x.ID);
                 });
 
             migrationBuilder.CreateTable(
@@ -190,6 +172,48 @@ namespace MockSchoolManagement.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Student",
+                schema: "School",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false),
+                    Major = table.Column<int>(type: "int", nullable: false),
+                    PhotoPath = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    EnrollmentDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Student", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Student_Person_ID",
+                        column: x => x.ID,
+                        principalSchema: "School",
+                        principalTable: "Person",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Teacher",
+                schema: "School",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "int", nullable: false),
+                    HireDate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Teacher", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Teacher_Person_ID",
+                        column: x => x.ID,
+                        principalSchema: "School",
+                        principalTable: "Person",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Department",
                 schema: "School",
                 columns: table => new
@@ -199,6 +223,7 @@ namespace MockSchoolManagement.Migrations
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
                     Budget = table.Column<decimal>(type: "money", nullable: false),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RowVersion = table.Column<byte[]>(type: "rowversion", rowVersion: true, nullable: true),
                     TeacherId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -209,7 +234,7 @@ namespace MockSchoolManagement.Migrations
                         column: x => x.TeacherId,
                         principalSchema: "School",
                         principalTable: "Teacher",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -229,7 +254,7 @@ namespace MockSchoolManagement.Migrations
                         column: x => x.TeacherId,
                         principalSchema: "School",
                         principalTable: "Teacher",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -280,7 +305,7 @@ namespace MockSchoolManagement.Migrations
                         column: x => x.TeacherId,
                         principalSchema: "School",
                         principalTable: "Teacher",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -310,7 +335,7 @@ namespace MockSchoolManagement.Migrations
                         column: x => x.StudentID,
                         principalSchema: "School",
                         principalTable: "Student",
-                        principalColumn: "Id",
+                        principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
                 });
 
@@ -439,6 +464,10 @@ namespace MockSchoolManagement.Migrations
 
             migrationBuilder.DropTable(
                 name: "Teacher",
+                schema: "School");
+
+            migrationBuilder.DropTable(
+                name: "Person",
                 schema: "School");
         }
     }
