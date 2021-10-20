@@ -15,10 +15,7 @@ namespace MockSchoolManagement.Models
         [Display(Name = "主修科目")]
         public MajorEnum Major { get; set; }
 
-        [Display(Name = "电子邮箱")]
-        [RegularExpression(@"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$",
-            ErrorMessage = "邮箱的格式不正确")]
-        [Required(ErrorMessage = "请输入邮箱地址，它不能为空！")]
+
         public string PhotoPath { get; set; }//照片路径
 
 
