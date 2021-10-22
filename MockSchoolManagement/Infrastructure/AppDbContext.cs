@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MockSchoolManagement.Models;
 using MockSchoolManagement.Models.EnumTypes;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using MockSchoolManagement.Models.BlogManagement;
 
 namespace MockSchoolManagement.Infrastructure
 {
@@ -28,6 +29,11 @@ namespace MockSchoolManagement.Infrastructure
         public DbSet<CourseAssignment> CourseAssignments { get; set; }
         public DbSet<Person> People { get; set; }
 
+        public DbSet<Blog> Blogs { get; set; }
+        public DbSet<Post> Posts { get; set; }
+        public DbSet<BlogImage> BlogImages { get; set; }
+
+        public DbSet<TodoItem> TodoItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
