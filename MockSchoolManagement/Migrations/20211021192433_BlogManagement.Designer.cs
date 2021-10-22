@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MockSchoolManagement.Infrastructure;
 
 namespace MockSchoolManagement.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20211021192433_BlogManagement")]
+    partial class BlogManagement
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -218,71 +220,6 @@ namespace MockSchoolManagement.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("MockSchoolManagement.Models.BlogManagement.Blog", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("BloggerName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Blogs");
-                });
-
-            modelBuilder.Entity("MockSchoolManagement.Models.BlogManagement.BlogImage", b =>
-                {
-                    b.Property<int>("BlogImageId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("BlogId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
-
-                    b.HasKey("BlogImageId");
-
-                    b.HasIndex("BlogId")
-                        .IsUnique();
-
-                    b.ToTable("BlogImages");
-                });
-
-            modelBuilder.Entity("MockSchoolManagement.Models.BlogManagement.Post", b =>
-                {
-                    b.Property<int>("PostId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int>("BId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Title")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PostId");
-
-                    b.HasIndex("BId");
-
-                    b.ToTable("Posts");
-                });
-
             modelBuilder.Entity("MockSchoolManagement.Models.Course", b =>
                 {
                     b.Property<int>("CourseID")
@@ -417,24 +354,6 @@ namespace MockSchoolManagement.Migrations
                     b.ToTable("StudentCourse", "School");
                 });
 
-            modelBuilder.Entity("MockSchoolManagement.Models.TodoItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<bool>("IsComplete")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("TodoItems");
-                });
-
             modelBuilder.Entity("MockSchoolManagement.Models.Student", b =>
                 {
                     b.HasBaseType("MockSchoolManagement.Models.Person");
@@ -510,28 +429,6 @@ namespace MockSchoolManagement.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MockSchoolManagement.Models.BlogManagement.BlogImage", b =>
-                {
-                    b.HasOne("MockSchoolManagement.Models.BlogManagement.Blog", "Blog")
-                        .WithOne("BlogImage")
-                        .HasForeignKey("MockSchoolManagement.Models.BlogManagement.BlogImage", "BlogId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Blog");
-                });
-
-            modelBuilder.Entity("MockSchoolManagement.Models.BlogManagement.Post", b =>
-                {
-                    b.HasOne("MockSchoolManagement.Models.BlogManagement.Blog", "Blog")
-                        .WithMany("Posts")
-                        .HasForeignKey("BId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Blog");
                 });
 
             modelBuilder.Entity("MockSchoolManagement.Models.Course", b =>
@@ -620,13 +517,6 @@ namespace MockSchoolManagement.Migrations
                         .HasForeignKey("MockSchoolManagement.Models.Teacher", "ID")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MockSchoolManagement.Models.BlogManagement.Blog", b =>
-                {
-                    b.Navigation("BlogImage");
-
-                    b.Navigation("Posts");
                 });
 
             modelBuilder.Entity("MockSchoolManagement.Models.Course", b =>
