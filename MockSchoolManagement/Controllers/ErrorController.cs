@@ -19,6 +19,7 @@ namespace MockSchoolManagement.Controllers
 
         [AllowAnonymous]
         [Route("Error/{statusCode}")]
+        [HttpGet]
         public IActionResult HttpStatusCodeHandler(int statusCode)
         {
             var statusCodeResult =

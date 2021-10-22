@@ -28,6 +28,10 @@ using MockSchoolManagement.Application.Courses;
 using MockSchoolManagement.Application.Teachers;
 using Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation;
 using NetCore.AutoRegisterDi;
+using Swashbuckle.AspNetCore;
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
 
 namespace MockSchoolManagement
 {
@@ -40,9 +44,35 @@ namespace MockSchoolManagement
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //注册swagger生成器
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { 
+                    Title = "MockSchoolManagement API", 
+                    Description= "为MockSchoolManagement系统，添加一个简单的ASP.NET CORE WEB API 示例",
+                    Version = "v1",
+                    //TermsOfService=new Uri("https://github.com/ShrimpDumpling"),
+                    Contact=new OpenApiContact
+                    {
+                        Name="JerryHuang",
+                        Email="JerryHuang@outlook.jp",
+                        Url=new Uri("https://github.com/ShrimpDumpling")
+                    },
+                    License=new OpenApiLicense
+                    {
+                        Name= "The MIT License",
+                        Url=new Uri("https://github.com/aws/mit-0")
+                    }
+                });
+
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+                var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+                c.IncludeXmlComments(xmlPath);
+
+            });
+
             services.AddHttpContextAccessor();
             services.AddScoped<IStudentRepository, SQLStudentRepositry>();
             services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -74,9 +104,6 @@ namespace MockSchoolManagement
                     //microsoleOptions.ClientSecret = Configuration["Authentication:Microsoft:ClientSecret"];
 
                 });
-            //.AddCookie(p => p.SlidingExpiration = true)
-
-            //services.AddAuthorization();
 
             services.Configure<IdentityOptions>(options =>
             {
@@ -178,7 +205,7 @@ namespace MockSchoolManagement
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env,ILogger<Startup> logger)
         {
-            app.UseDataInitializer(); //初始化种子数据的方法，调试的时候使用
+            //app.UseDataInitializer(); //初始化种子数据的方法，调试的时候使用
 
 
 
@@ -195,11 +222,23 @@ namespace MockSchoolManagement
             }
 
 
+           
+
 
             //app.UseDirectoryBrowser();
             //app.UseDefaultFiles();
             //app.UseStaticFiles();
             app.UseFileServer();
+
+            if (env.IsDevelopment())
+            {
+                //开发环境下启用swagget中间件
+                app.UseSwagger();
+                app.UseSwaggerUI(c =>
+                {
+                    c.SwaggerEndpoint("v1/swagger.json", "My API V1");
+                });
+            }
 
             app.UseCookiePolicy();
             app.UseAuthentication();//授权
@@ -209,48 +248,6 @@ namespace MockSchoolManagement
                 routes.MapRoute("default", "{controller=Home}/{action=Index}/{id?}");
             });
             
-            //app.UseMvcWithDefaultRoute();
-            //app.UseRouting();
-            //app.UseEndpoints(endpoiints =>
-            //{
-            //    endpoiints.MapControllers();
-            //});
-
-
-
-
-            //app.UseRouting();
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapGet("/", async context =>
-            //     {
-            //         context.Response.ContentType = "text/plain;charset=UTF-8";
-            //         //var processName = System.Diagnostics.Process.GetCurrentProcess().ProcessName;
-
-            //         //await context.Response.WriteAsync(processName);
-            //         await context.Response.WriteAsync(Configuration["MyKey"].ToString());
-            //     });
-            //});
-
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //}
-            //else
-            //{
-            //    app.UseExceptionHandler("/Error");
-            //}
-
-            //app.UseStaticFiles();
-
-            //app.UseRouting();
-
-            //app.UseAuthorization();
-
-            //app.UseEndpoints(endpoints =>
-            //{
-            //    endpoints.MapRazorPages();
-            //});
         }
 
         public bool AuthorizaAccess(AuthorizationHandlerContext context)

@@ -42,7 +42,7 @@ namespace MockSchoolManagement.ViewModels
 
         /// <summary>
         /// 系部主任
-        /// </summary
+        /// </summary>
         public Teacher Administrator { get; set; }
     }
 }
