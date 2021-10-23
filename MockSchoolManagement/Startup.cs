@@ -32,6 +32,7 @@ using Swashbuckle.AspNetCore;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
+using MockSchoolManagement.Application.Dtos;
 
 namespace MockSchoolManagement
 {
@@ -88,9 +89,16 @@ namespace MockSchoolManagement
 
             //services.AddScoped<IStudentService, StudentService>();
             //services.AddScoped<ICourseService,CourseService>();
-            services.RegisterAssemblyPublicNonGenericClasses()
+            //×Ô¶¯×¢Èë
+            var assembliesToScan = new[]
+            {
+                Assembly.GetExecutingAssembly(),
+                Assembly.GetAssembly(typeof(PagedResultDto<>)),
+            };
+            services.RegisterAssemblyPublicNonGenericClasses(assembliesToScan)
                 .Where(c => c.Name.EndsWith("Service"))
                 .AsPublicImplementedInterfaces(ServiceLifetime.Scoped);
+
 
 
             services.AddAuthentication()

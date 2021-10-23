@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSchoolManagement", "MockSchoolManagement\MockSchoolManagement.csproj", "{ECF72080-8BA8-478F-BBB9-68756A09E0B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSchoolManagement.Mvc", "MockSchoolManagement\MockSchoolManagement.Mvc.csproj", "{ECF72080-8BA8-478F-BBB9-68756A09E0B0}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSchoolManagement.Dal", "MockSchoolManagement.Dal\MockSchoolManagement.Dal.csproj", "{53170683-E23D-49C9-8FCD-C04679EA2DEF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSchoolManagement.Core", "MockSchoolManagement.Dal\MockSchoolManagement.Core.csproj", "{53170683-E23D-49C9-8FCD-C04679EA2DEF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSchoolManagement.Bll", "MockSchoolManagement.Bll\MockSchoolManagement.Bll.csproj", "{7A40E18C-A453-45AF-8A21-37B6F3D03AA2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MockSchoolManagement.Application", "MockSchoolManagement.Bll\MockSchoolManagement.Application.csproj", "{7A40E18C-A453-45AF-8A21-37B6F3D03AA2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MockSchoolManagement.EntityFrameworkCore", "MockSchoolManagement.EntityFrameworkCore\MockSchoolManagement.EntityFrameworkCore.csproj", "{0B5BDDAD-8C61-46B4-A353-ACE818265BBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{7A40E18C-A453-45AF-8A21-37B6F3D03AA2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7A40E18C-A453-45AF-8A21-37B6F3D03AA2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7A40E18C-A453-45AF-8A21-37B6F3D03AA2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B5BDDAD-8C61-46B4-A353-ACE818265BBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B5BDDAD-8C61-46B4-A353-ACE818265BBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B5BDDAD-8C61-46B4-A353-ACE818265BBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B5BDDAD-8C61-46B4-A353-ACE818265BBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
